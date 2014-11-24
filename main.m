@@ -2,7 +2,7 @@
 
 cd /Users/bieler/Desktop/matlab/segmentation2
 
-expe = experimentPara();
+[expe mainDir imgDir] = experimentPara();
 
 % Define some stuff, move into the right folder
 
@@ -418,6 +418,15 @@ clfh
 sel = ind(longTraces(i),:) > 0;
 errorbar(refinedMean(longTraces(i),sel,1),refinedStd(longTraces(i),sel,1),'r');
 errorbar(refinedMean(longTraces(i),sel,2),refinedStd(longTraces(i),sel,2),'g');
+
+
+%% plot trajectories for onur
+
+clfh
+for i=1:size(ind,1)
+    sel= ind(i,:)>0;
+    plot(trajX(i,sel),trajY(i,sel),'color',rand(3,1))
+end
 
 %% make small images around each cell for the trace tool 
 % use if you don't want to do the refine area thing above
