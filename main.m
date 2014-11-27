@@ -2,7 +2,10 @@
 
 cd /Users/bieler/Desktop/matlab/segmentation2
 
-[expe mainDir imgDir] = experimentPara();
+expe = experimentPara();
+
+mainDir = expe.mainDir;
+imgDir = expe.imgDir;
 
 % Define some stuff, move into the right folder
 
