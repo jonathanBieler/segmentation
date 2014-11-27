@@ -6,6 +6,7 @@ expe = experimentPara();
 
 mainDir = expe.mainDir;
 imgDir = expe.imgDir;
+N = expe.numberOfFrames;
 
 % Define some stuff, move into the right folder
 

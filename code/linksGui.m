@@ -89,8 +89,9 @@ function linksGui_OpeningFcn(hObject, eventdata, handles, varargin)
     if(exist([moviePath 'zStackedThreshCorrected/1.png'],'file'))
         seg = imread([moviePath 'zStackedThreshCorrected/' num2str(k) '.png']);
     else
-        copyFileButton_Callback(hObject, eventdata, handles)
-        edit4_Callback(hObject, eventdata, handles)
+        copyFileButton_Callback(hObject, eventdata, handles);
+        seg = imread([moviePath 'zStackedThreshCorrected/' num2str(k) '.png']);
+        
     end
     
     
@@ -125,7 +126,8 @@ function linksGui_OpeningFcn(hObject, eventdata, handles, varargin)
         handles.seg = 0;
         doLinksOnly = 1;
         disp('Doing the initial tracking')
-        updateTracking_Callback(0, eventdata, handles,doLinksOnly);        
+        updateTracking_Callback(0, eventdata, handles,doLinksOnly);    
+        edit4_Callback(hObject, eventdata, handles)
     else
         
         load links.mat;
