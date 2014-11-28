@@ -22,7 +22,7 @@ function varargout = linksGui(varargin)
 
 % Edit the above text to modify the response to help linksGui
 
-% Last Modified by GUIDE v2.5 05-Sep-2014 11:43:47
+% Last Modified by GUIDE v2.5 28-Nov-2014 11:55:19
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -127,7 +127,7 @@ function linksGui_OpeningFcn(hObject, eventdata, handles, varargin)
         doLinksOnly = 1;
         disp('Doing the initial tracking')
         updateTracking_Callback(0, eventdata, handles,doLinksOnly);    
-        edit4_Callback(hObject, eventdata, handles)
+        %edit4_Callback(hObject, eventdata, handles)
     else
         
         load links.mat;
@@ -165,6 +165,7 @@ function linksGui_OpeningFcn(hObject, eventdata, handles, varargin)
     set(gcf, 'WindowKeyPressFcn', @KeyPress)
     set(gcf, 'WindowScrollWheelFcn', @MouseScroll)
     
+    set(gcf,'WindowButtonDownFcn',@MouseClick);
         
     set(gcf, 'WindowKeyReleaseFcn', @KeyRelease)
 
@@ -286,7 +287,7 @@ switch EventData.Character
     
     case 'u'
         
-        updateTracking_Callback(0, EventData, handles,0);
+        updateTracking_Callback(0, EventData, handles);
     
     case '+'
         
@@ -692,8 +693,14 @@ function MouseScroll(hObject,eventdata)
     th = max(th,0);
     set(handles.edit3,'String',num2str(th));
     
+function MouseClick(hObject,eventdata)
 
-    
+
+    EventData = struct();
+    EventData.Character = 's';
+
+    KeyPress(0, EventData)
+
 
 function mouseMove(hObject,eventdata)
 
@@ -926,6 +933,8 @@ function edit4_Callback(hObject, eventdata, handles)
 
     global k moviePath;
     
+    k = str2double( get(handles.edit4,'string') );
+    
 
     seg = imread([moviePath 'zStackedThreshCorrected/' num2str(k) '.png']);
     handles.seg = seg;
@@ -1060,14 +1069,18 @@ function dispLinks_Callback(hObject, eventdata, handles)
 
 
 % --- Executes on button press in updateTracking.
-function updateTracking_Callback(hObject, eventdata, handles,doLinksOnly)
+function updateTracking_Callback(hObject, eventdata, handles, doLinksOnly)
 % hObject    handle to updateTracking (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
     if(nargin == 3)
-        doLinksOnly = 0;
+        
+        doLinksOnly = get(handles.doLinksOnly,'value');
+        
     end
+    
+    
 
     global Nframes k moviePath;    
     seg = handles.seg;
@@ -1093,3 +1106,12 @@ function updateTracking_Callback(hObject, eventdata, handles,doLinksOnly)
     load nuclei.mat;
     
     updateImageSeg(seg,previousSeg)
+
+
+% --- Executes on button press in doLinksOnly.
+function doLinksOnly_Callback(hObject, eventdata, handles)
+% hObject    handle to doLinksOnly (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of doLinksOnly

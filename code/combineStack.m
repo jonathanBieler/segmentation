@@ -1,15 +1,13 @@
 %out = combineStack(names,N1,N2,deNoise,medianSize,weightsSegmentation,weightsData,doDraw)
-function [out,N1,N2] = combineStack(names,Nz,deNoise,medianSize,weightsSegmentation,weightsData,doDraw)
+function [out,N1,N2] = combineStack(names,Nz,deNoise,medianSize,compressionQuantile,gaussianFilterSize,weightsSegmentation,doDraw)
 
 a = imread(names{1});
 [N1,N2] = size(a);
 
 a = zeros(N1,N2,Nz);
 
-H = fspecial('gaussian',300,60);
+H = fspecial('gaussian',300,gaussianFilterSize);
     
-
-
 
 for i=1:Nz
 
@@ -19,13 +17,13 @@ for i=1:Nz
 
     tmp = a(:,:,i);
 
-    q = quantile(tmp(:),0.96);
+    q = quantile(tmp(:),0.98*compressionQuantile);
     tmp(tmp>q)=q;
 
     %highpass filter to homogenize the backgroud
     tmp = a(:,:,i) - imfilter(tmp,H,'symmetric'); 
     
-    q = quantile(tmp(:),0.99);
+    q = quantile(tmp(:),compressionQuantile);
     tmp(tmp>q)=q; 
     
     switch deNoise

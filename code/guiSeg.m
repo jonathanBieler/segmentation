@@ -70,6 +70,8 @@ if( ismember( imInd,segParaFrames ) )
     
 end
 
+set(gcf,'WindowStyle','normal')
+
 
 function KeyPress(Source, EventData)
     
@@ -214,7 +216,9 @@ function [] = doSegment(handles)
     b = imread( ['zStackedThresh/' num2str(imInd) '.png'] );
 
     %superpose both
-    b = (edge(b,'log',0));
+    %b = (edge(b,'log',0));
+    b = bwmorph(b,'remove');
+
 
     a(b==1) = min(a(:));
 

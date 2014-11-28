@@ -28,9 +28,11 @@ Nz = expe.numberOfColors; %number of images to combine
 deNoise = {'none','BM3D','median','localNorm'}; %denoise algo on each stack
 deNoise = deNoise{3};
 
-medianSize = 3;
+medianSize = 5;
 
-weightsSegmentation = [1 0.2 1]; 
+weightsSegmentation = [1 0.2 1]; %weights for summing the different channels
+compressionQuantile = 0.99;      %signal above this quantile will be cut off, set to 1 to disable
+gaussianFilterSize = 60;         %typycal length of the background
 
 doDraw = 1;
 
@@ -47,7 +49,7 @@ for k=1:N
         imagesPath{i} = [outDir 'img/' getImageName(expe.colorNames{i},k)];
     end
             
-    [out,N1,N2] = combineStack(imagesPath,Nz,deNoise,medianSize,weightsSegmentation,weightsData,doDraw);
+    [out,N1,N2] = combineStack(imagesPath,Nz,deNoise,medianSize,compressionQuantile,gaussianFilterSize,weightsSegmentation,doDraw);
     imwrite(out,['zStackedYFP/' num2str(k) '.png']);
         
 end
@@ -59,7 +61,7 @@ for k=1:N
     
         disp(100*k/N)                 
         a = imread(['zStackedYFP/' num2str(k) '.png']);        
-        imagesc(a); caxis([0 150])        
+        imagesc(a); caxis([0 250])        
         pause(0.08); drawnow;        
 end
 
