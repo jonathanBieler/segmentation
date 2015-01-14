@@ -15,6 +15,9 @@ expe.indexOfFirstMovie = 21;
 expe.numberOfColors = 2;
 expe.colorNames = {'YFP','Cy32'};
 
+expe.hasTrans = 1;
+expe.transName = 'Trans';
+
 expe.imgDir = '/Volumes/Naef-Lab/Rosie/20141114_3t3_wt_or_3t3_Venus_transfection_plus_mKate_plus_or_3T3_Fucci/';
 
 expe.mainDir = '/Users/bieler/Desktop/matlab/segmentation2';

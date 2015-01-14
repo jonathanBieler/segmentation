@@ -28,11 +28,11 @@ Nz = expe.numberOfColors; %number of images to combine
 deNoise = {'none','BM3D','median','localNorm'}; %denoise algo on each stack
 deNoise = deNoise{3};
 
-medianSize = 5;
+medianSize = 3;
 
-weightsSegmentation = [1 0.2 1]; %weights for summing the different channels
+weightsSegmentation = [1 1 1]; %weights for summing the different channels
 compressionQuantile = 0.99;      %signal above this quantile will be cut off, set to 1 to disable
-gaussianFilterSize = 60;         %typycal length of the background
+gaussianFilterSize = 50;         %typycal length of the background
 
 doDraw = 1;
 

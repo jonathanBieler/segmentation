@@ -22,7 +22,7 @@ function varargout = linksGui(varargin)
 
 % Edit the above text to modify the response to help linksGui
 
-% Last Modified by GUIDE v2.5 28-Nov-2014 11:55:19
+% Last Modified by GUIDE v2.5 14-Jan-2015 15:38:32
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -97,7 +97,7 @@ function linksGui_OpeningFcn(hObject, eventdata, handles, varargin)
     
     global a; 
     
-    a = imread([moviePath 'zStackedYFP/' num2str(k) '.png']);
+    a = getImage(k,handles);
         
     axes(axesSeg)
     segImage = imagesc(seg);
@@ -172,7 +172,20 @@ function linksGui_OpeningFcn(hObject, eventdata, handles, varargin)
     % UIWAIT makes linksGui wait for user response (see UIRESUME)
     % uiwait(handles.figure1);
     
-  
+
+function a = getImage(k,handles)
+    
+    global moviePath;
+
+    expe = experimentPara();
+    
+    if( expe.hasTrans && get(handles.transCheckBox,'value')  )
+        a = abs( imread([moviePath 'img/' getImageName(expe.transName,k)]) );
+    else
+        a = imread([moviePath 'zStackedYFP/' num2str(k) '.png']);
+    end
+    
+
 
 
 % --- Outputs from this function are returned to the command line.
@@ -281,9 +294,24 @@ EventData.Character
 
 N1 = size(seg,1);
 N2 = size(seg,2);
+
+
   
 switch EventData.Character
     
+    case ' '
+        
+        set(handles.transCheckBox,'value', ~get(handles.transCheckBox,'value') );
+        
+        C = get(handles.axesSeg, 'CurrentPoint');
+        i = ceil(C(1,1));
+        j = ceil(C(1,2));
+
+        i = max(i,1); j = max(j,1);             
+        i = min(i,512); j = min(j,512);
+        
+        a = getImage(k,handles);
+        updateImageData(i,j);
     
     case 'u'
         
@@ -463,7 +491,7 @@ switch EventData.Character
             
             k=min(k+1,Nframes);
 
-            a = imread([moviePath 'zStackedYFP/' num2str(k) '.png']);
+            a = getImage(k,handles);
             seg = imread([moviePath 'zStackedThreshCorrected/' num2str(k) '.png']);
 
             if(k>1)
@@ -487,7 +515,7 @@ switch EventData.Character
        
         k=k-4;
 
-        a = imread([moviePath 'zStackedYFP/' num2str(k) '.png']);
+        a = getImage(k,handles);
         seg = imread([moviePath 'zStackedThreshCorrected/' num2str(k) '.png']);
 
         if(k>1)
@@ -612,7 +640,7 @@ switch EventData.Character
 
             k = max(k-1,1);
 
-            a = imread([moviePath 'zStackedYFP/' num2str(k) '.png']);
+            a = getImage(k,handles);
             seg = imread([moviePath 'zStackedThreshCorrected/' num2str(k) '.png']);
 
             if(k>1)
@@ -639,7 +667,7 @@ switch EventData.Character
 
             k=min(k+1,Nframes);
 
-            a = imread([moviePath 'zStackedYFP/' num2str(k) '.png']);
+            a = getImage(k,handles);
             seg = imread([moviePath 'zStackedThreshCorrected/' num2str(k) '.png']);
 
             if(k>1)
@@ -704,7 +732,6 @@ function MouseClick(hObject,eventdata)
 
 function mouseMove(hObject,eventdata)
 
-
    
     %global axesSeg dKey previousMouseX previousMouseY;
     global aKey axesData k a moviePath;
@@ -753,7 +780,7 @@ function mouseMove(hObject,eventdata)
         
         dataIx = min(k + kk,Nframes);
         
-        a = imread([moviePath 'zStackedYFP/' num2str(dataIx) '.png']);
+        a = getImage(dataIx,handles);
                 
         updateImageData(0,0);
         
@@ -812,7 +839,7 @@ function mouseMove(hObject,eventdata)
         i = ceil(mouseX);
         j = ceil(mouseY);
         
-        if(rand <0.4)
+        if(rand <0.6)
             updateImageData(i,j);
         end
         
@@ -1115,3 +1142,12 @@ function doLinksOnly_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of doLinksOnly
+
+
+% --- Executes on button press in transCheckBox.
+function transCheckBox_Callback(hObject, eventdata, handles)
+% hObject    handle to transCheckBox (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of transCheckBox
