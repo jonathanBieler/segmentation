@@ -233,7 +233,7 @@ makePeakAndDivMatrices
 
 %% refine area and signal around each cell, and do images for guiTraces
 
-doDrawBkg = 0;  %display background measurement
+doDrawBkg = 0;  %display there area where the background is measured 
 doDraw = 0;     %display area refinement result
 
 bgkSize = 4;    %size around the cell where the background is not quantified
