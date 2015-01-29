@@ -263,7 +263,7 @@ save bkg.mat bkg
 save refinedArea.mat refinedArea
 save touchBorder.mat touchBorder
 
-%% plot mean signal 1 and 2 of trace i with std
+%% plot mean signal of trace i with std
 
 i=1
 
@@ -276,7 +276,7 @@ end
 
 xlabel('time')
 
-%% plot mean signal 1, trace i 
+%% plot mean signal, trace i 
 
 i=1
 
@@ -286,7 +286,7 @@ plot(expe.t(sel),refinedMean(longTraces(i),sel,1),'r');
 %plot(expe.t(sel),refinedMean(longTraces(i),sel,2),'g');
 
 
-%% plot sum of signal 1, trace i 
+%% plot sum of signal, trace i 
 
 i=1
 
