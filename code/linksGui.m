@@ -225,7 +225,7 @@ function updateImageSeg(seg,previousSeg)
         if(~isempty(links)) 
             tmp = links{k};    
 
-            for i=1:length(tmp)
+            for i=1:size(tmp,1)
 
                 x1 = nuclei(k).carth( tmp(i,1),: );                
                 x2 = nuclei(tmp(i,3)).carth( tmp(i,2),: );

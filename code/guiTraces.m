@@ -366,12 +366,12 @@ function updatePlot(handles)
     nonZeroIdx = find(ind(idx,:) > 0);
     nonZeroIdx = nonZeroIdx(1);
     
-    divInd = find( idx == [divisions.sisterInd] );
-    
-    if(length(divInd) == 1)
-       
-        plot(expe.t(1:divisions(divInd).motherFrame), signal(divisions(divInd).motherInd,1:divisions(divInd).motherFrame,1),'color','k','lineWidth',1)
-                
+    if(~isempty(divisions))
+        divInd = find( idx == [divisions.sisterInd] );
+
+        if(length(divInd) == 1)       
+            plot(expe.t(1:divisions(divInd).motherFrame), signal(divisions(divInd).motherInd,1:divisions(divInd).motherFrame,1),'color','k','lineWidth',1)                
+        end
     end
     
     for j=1:size(maxp,1)

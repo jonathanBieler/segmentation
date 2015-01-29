@@ -76,6 +76,7 @@ for i = expe.indexOfFirstMovie:(expe.indexOfFirstMovie + expe.numberOfMovies  -1
             A = imread(fname, k);
 
             if(doDraw && mod(k,5)==0)
+                clf
                 imagesc(A)
                 drawnow
             end
@@ -114,6 +115,7 @@ for i = expe.indexOfFirstMovie:(expe.indexOfFirstMovie + expe.numberOfMovies  -1
             A = imread(fname, k);
 
             if(doDraw && mod(k,5)==0)
+                clf
                 imagesc(A)
                 drawnow
             end

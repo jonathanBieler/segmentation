@@ -6,19 +6,19 @@ expe=struct();
 
 %% change this
 
-expe.numberOfFrames = 144;
+expe.numberOfFrames = 59;
 expe.dt = 0.5;
 
-expe.numberOfMovies = 2;
-expe.indexOfFirstMovie = 21;
+expe.numberOfMovies = 1;
+expe.indexOfFirstMovie = 1;
 
-expe.numberOfColors = 2;
-expe.colorNames = {'YFP','Cy32'};
+expe.numberOfColors = 1;
+expe.colorNames = {'FITC'};
 
-expe.hasTrans = 1;
+expe.hasTrans = 0;
 expe.transName = 'Trans';
 
-expe.imgDir = '/Volumes/Naef-Lab/Rosie/20141114_3t3_wt_or_3t3_Venus_transfection_plus_mKate_plus_or_3T3_Fucci/';
+expe.imgDir = '/Users/bieler/Desktop/moviesAndrea/RALYTest/';
 
 expe.mainDir = '/Users/bieler/Desktop/matlab/segmentation2';
 

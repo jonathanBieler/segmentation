@@ -1,7 +1,7 @@
 function [tracks, signal, traj, ind, divisions, divPerframe, trajX, trajY] = doTracking(N, Me,doLinksOnly)
 
 
-weigth = [1/5 1/8 1];
+weigth = 0.03*[1/5 1/8 1]; %weights of the different signals (two here) and the area 
 
 %define data given to the tracking algo
 nuclei = struct;
@@ -19,9 +19,14 @@ for i=1:N
        p(j,end) = m(j).Area * weigth(end);
    end
    
-   nuclei(i).properties = 0.03*p;
+   nuclei(i).properties = p;
 end
 
+disp(['Typical coordinates values'])
+disp(nuclei(1).carth)
+disp(['Typical properties values (signal and area)'])
+disp(nuclei(1).properties)
+fprintf('If the values in properties are larger \nthan carthesian coordinates, edit the weights doTracking.m\n\n')
 
 %
 save nuclei.mat nuclei;
@@ -31,7 +36,7 @@ save nuclei.mat nuclei;
 addpath ../code/Tracking/
 addpath ../code/Tracking/libraries/
 
-doDraw = 0; imageFraction = 1;
+doDraw = 0; 
 
 %%
 

@@ -72,19 +72,22 @@ k = 1;
         tmp = signal(idx,:,k);
 
         %tracking division
-        dd = find([divisions.motherInd] == idx);
-        for j=1:length(dd)
+        if(~isempty(divisions) )
+            
+            dd = find([divisions.motherInd] == idx);
+            for j=1:length(dd)
 
-            ff = divisions(dd(j)).motherFrame;        
-            divMatrix(idx,ff,k)=1;
+                ff = divisions(dd(j)).motherFrame;        
+                divMatrix(idx,ff,k)=1;
+            end
 
-        end
+            dd = find([divisions.sisterInd] == idx);    
+            for j=1:length(dd)
 
-        dd = find([divisions.sisterInd] == idx);    
-        for j=1:length(dd)
-
-            ff = divisions(dd(j)).sisterFrame;        
-            divMatrix(idx,ff,k)=1;        
+                ff = divisions(dd(j)).sisterFrame;        
+                divMatrix(idx,ff,k)=1;        
+            end
+        
         end
 
         %detect from trace with low false neg (hopefully)
@@ -141,20 +144,28 @@ save divMatrix.mat divMatrix
 %%
 
 areaMatrix = zeros(size(ind));
+signalSum = zeros([size(ind) expe.numberOfColors]);
 
 for t=1:N
 
     Measurements = Me{t};
 
     for ii=1:size(ind,1)
-        if( ind(ii,t) > 0 && ind(ii,t) < length(Measurements) )
+        if( ind(ii,t) > 0 && ind(ii,t) <= length(Measurements) )
 
             areaMatrix(ii,t) = Measurements(ind(ii,t)).Area;
+            
+            for col = 1:expe.numberOfColors
+            px = Measurements(ind(ii,t)).PixelValues;
+            signalSum(ii,t,col) = sum( px(col,:));
+            end
         end
     end
 end
 
 imagesc(areaMatrix)
+colormap jet
 
 save areaMatrix.mat areaMatrix
+save signalSum.mat signalSum
 

@@ -181,6 +181,7 @@ if( ~doLinksOnly )
   alt_cost = prctile(mutual_dist(~isinf(mutual_dist)), 90);
   alt_dist = eye(max(nends, nstarts))*alt_cost;
   alt_dist(alt_dist==0) = Inf;
+  alt_dist(isnan(alt_dist)) = Inf;
 
   [merge_dist, merge_weight, alt_weight] = joining_weight(ends, interm, all_pts, links);
   frame_indx = -bsxfun(@minus, ends(:,end), interm(:,end).');
@@ -201,7 +202,7 @@ if( ~doLinksOnly )
 %   merge_weight = 10*merge_weight;
 %   alt_weight = 1*alt_weight;
 
-   split_weight = 0.3*split_weight;
+   split_weight = track_opts.split_cost*0.3*split_weight;
    merge_weight = 10*merge_weight;
    alt_weight = 0.1*alt_weight;    
 
@@ -227,10 +228,6 @@ if( ~doLinksOnly )
   disp(['alt_split_weight: ' num2str(mean(alt_split_weight(isfinite(alt_split_weight))))]);
   disp(['alt_weight: ' num2str(mean(alt_weight(isfinite(alt_weight))))]);
   
-  if( isnan( mean(merge_weight(isfinite(merge_weight)) )) )
-     error('fucking nan') 
-  end
-  
   
   %trans_dist = (dist(1:nends+ninterm, 1:nstarts+ninterm).' < Inf) * min(mutual_dist(:));
   
@@ -238,6 +235,11 @@ if( ~doLinksOnly )
   trans_dist(trans_dist == 0) = Inf;
 
   dist(nends+ninterm+1:end,nstarts+ninterm+1:end) = trans_dist;
+  
+  if( sum( isnan( dist )) )
+     error('fucking nan') 
+  end
+  
 
   tic
   %[assign, cost] = munkres(dist);

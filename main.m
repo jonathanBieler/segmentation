@@ -10,7 +10,7 @@ N = expe.numberOfFrames;
 
 % Define some stuff, move into the right folder
 
-movie = 21;
+movie = 1;
 
 outDir = [mainDir '/movie' num2str(movie) '/'];
 cd(outDir)
@@ -19,6 +19,7 @@ cd(outDir)
 addpath ../
 addpath ../code
 addpath ../code/regionbased_seg
+set(0,'defaultlinelinewidth',2)
 
 
 %% combine stacks, denoise, ...
@@ -95,8 +96,8 @@ for frame=1:N
         
     if(segMethod ==1)
         
-        [filters openFilter] = generateFilters(para,doDraw);
-        segmentImage(frame,para,inputFolder,filters,openFilter,0);
+        [filters openFilter] = generateFilters(para,0);
+        segmentImage(frame,para,inputFolder,filters,openFilter,doDraw);
     else
     
         load ../segmentationCoeff.mat
@@ -119,7 +120,7 @@ mkdirIfNotExist(saveFolder)
 
 doDraw = 0;
 
-threshold = 1.5; %low value -> split everything
+threshold = 1.6; %low value -> split everything
 
 splitMergeCells;
 
@@ -139,7 +140,7 @@ if doDraw
          b = double(b);
 
          imagesc(a+b);
-         pause(0.1)
+         pause(0.01)
     end
 end
 
@@ -156,16 +157,22 @@ clf;
 plot(nObj)
 ylabel('number of objects')
 
+%% tweak tracking parameters
+% main parameters are frame_displacement and split_cost
+
+edit('get_struct.m');
+
 %% load all measures & do the final Tracking
 
 NToTrack = N;
 
 doLinksOnly = 0;
 
+clc
 Me = loadMeasures(N);
 [tracks, signal, traj, ind, divisions,divPerframe,trajX,trajY] = doTracking(NToTrack, Me,doLinksOnly);
 
-clf; imagesc( signal(:,:,1) )
+clf; imagesc( signal(:,:,1) ); colormap jet
 
 %%
 
@@ -192,7 +199,7 @@ indAnnotation = zeros(size(ind));
 if( exist('lengthThresh.mat','file') )
     load lengthThresh.mat;
 else
-    lengthThresh = 0.5;
+    lengthThresh = 0.3; %note: to change lengthThresh value you first need to delete the file if it exists: !rm lengthThresh.mat
 end
 
 for i=1:size(ind,1)
@@ -221,7 +228,7 @@ colormap jet
 save lengthThresh.mat lengthThresh
 save longTraces.mat longTraces
 
-%% build area, peak and div matrices
+%% build area, sum of signal, peak and div matrices
 
 minTimeBetweenPeaks = 5;
 peakMethod ='diff';
@@ -229,10 +236,13 @@ doDraw =0;
 
 makePeakAndDivMatrices
 
-%% refine area and do little images
+%% refine area and signal around each cell, and do images for guiTraces
 
-doDraw = 1;
-superSampling = 1;
+doDrawBkg = 0;  %display background measurement
+doDraw = 0;     %display area refinement result
+
+bgkSize = 4;    %size around the cell where the background is not quantified
+superSampling = 1; %increase the resolution of the image
 
 mkdirIfNotExist('snapShots')
 
@@ -241,192 +251,67 @@ a = imread(['zStackedYFP/' num2str(1) '.png']);
 N1=size(a,1);
 N2=size(a,2);
 
-touchBorder = zeros(size(areaMatrix));
+touchBorder = zeros(size(areaMatrix)); %is equale to one if the cell is touching the border of the image
 refinedArea = zeros(size(areaMatrix));
 
-refinedMean = zeros([size(areaMatrix) size(signal,3)]);
-refinedStd  = zeros([size(areaMatrix) size(signal,3)]);
+refinedMean = zeros([size(areaMatrix) size(signal,3)]); %mean of the pixel values 
+refinedSum = zeros([size(areaMatrix) size(signal,3)]);  %sum of the pixel values 
+refinedStd  = zeros([size(areaMatrix) size(signal,3)]); %standard deviation of the pixel values 
 
 bkg  = zeros([size(areaMatrix) size(signal,3)]);
 
-for n=1:length(longTraces)
-        
-    idx = longTraces(n);        
-
-    clf;
-
-    s = 40;
-
-    w=2*s+1;
-    nR = 6;
-    tot = NToTrack;
-
-    d = round(tot/nR);
-    out = zeros(d*w,nR*w);
-    
-    %i = round(traj{idx}(:,1));
-    %j = round(traj{idx}(:,2));
-    
-    for k=1:N
-
-        k
-        if( ind(idx,k)~=0 )
-            a = imread(['zStackedYFP/' num2str(k) '.png']);
-
-            data = {};
-            for j=1:expe.numberOfColors            
-                data{j} = imread( ['img/' getImageName(expe.colorNames{j},k)] );
-            end
-                        
-            m = imread(['zStackedThreshCorrected/' num2str(k) '.png']);
-            name = ['Measures/' num2str(k) '.mat'];
-                
-            pos = Me{k}(ind(idx,k)).Centroid;
-            pos = round(pos);
-
-            i = pos(1);
-            j = pos(2);
-
-            %[seli selj] = getNeiInd( i,j,s,N1,N2 );
-            
-            seli = (i-s):(i+s); 
-            selj = (j-s):(j+s); 
-            
-            valid = seli > 0 & selj >0  & seli <= N2 & selj <= N1;
-
-                
-            seli = seli(valid);
-            selj = selj(valid);
-
-            sub_a = a(selj,seli);
-            
-            sub_data = {};
-            for j=1:expe.numberOfColors  
-                sub_data{j} = data{j}(selj,seli);
-            end
-                        
-            bgkMask = m(selj,seli);
-            bgkMask = imdilate(bgkMask,strel('disk',3));   
-
-            for j=1:expe.numberOfColors  
-
-                if(~isempty(sub_a(~bgkMask)))
-                    bkg(idx,k,j) = median( sub_data{j}(~bgkMask) );
-                else
-                    bkg(idx,k,j) = -1;
-                end
-
-            end
-            
-
-            px = Me{k}; %erase other objects
-            px=px(ind(idx,k)).PixelIdxList; 
-            m=double(m);
-            m(px)=2;
-            m = m==2;
-
-            m = m(selj,seli);      
-            %imagesc(m)
-            %drawnow
-            
-            %check if object touch the border of the frame
-            updateArea = 1;
-            if( (sum(m(:,1)) + sum(m(:,end)) + sum(m(1,:)) + sum(m(end,:)))>0 )
-           
-                touchBorder(idx,k) = 1;                
-                updateArea = 0;
-            end
-            
-            %m = imdilate(m,strel('disk',1));   
-    
-            if( superSampling > 1)
-                sub_a = imresize(sub_a,superSampling);
-                
-                for j=1:expe.numberOfColors  
-                    sub_data{j} = imresize(sub_data{j},superSampling);
-                end 
-                m = imresize(m,superSampling);
-            end
-           
-            if(updateArea)
-                seg = region_seg(sub_a, m, 12,0.8,doDraw && mod(k,1)==0); %-- Run segmentation
-            else
-                seg = m;   
-            end
-
-            %
-            tmp = imclearborder(seg);
-
-            if( sum(tmp(:)) > 0 )
-                 seg = tmp;
-            end
-
-            %quantify green
-            
-            for j=1:expe.numberOfColors  
-                
-                tmp = double(sub_data{j}(seg==1));            
-                qu = quantile(tmp,0.95);    ql = quantile(tmp,0.05);
-                tmp = tmp(  (tmp < qu) & (tmp > ql) );
-
-                refinedMean(idx,k,j)    = mean(tmp);            
-                refinedStd(idx,k,j) = std(tmp);
-            
-            end
-            
-            refinedArea(idx,k) = sum(seg(:))/superSampling^2;
-            
-            
-            %make small image while we are at it   
-            b1 = bwmorph(seg,'remove');
-            sub_a(b1) = min(sub_a(:));
- 
-            %save image as png for GUI
-            imwrite(sub_a,['snapShots/' num2str(idx) '_' num2str(k) '.png']);
-
-        end      
-    end
-    
-
-    
-    clf;
-    subplot_tight(2,1,1,0.1); hold on
-        plot(areaMatrix(idx,:),'k');
-        plot(refinedArea(idx,:),'r');
-        plot(10*touchBorder(idx,:),'g');
-    subplot_tight(2,1,2,0.1); hold on
-        %plot(refinedMean(idx,:)-refinedStd(idx,:),'r--');
-        %plot(refinedMean(idx,:)+refinedStd(idx,:),'r--');
-
-        plot(refinedMean(idx,:,1),'r');
-        plot(refinedMean(idx,:,2),'g');
-        plot(signal(idx,:,1),'k')
-        plot(signal(idx,:,2),'k')
-        
-        plot(bkg(idx,:,1),'r--')
-        plot(bkg(idx,:,2),'g--')
-    drawnow
-    
-end
-
+refineAreaAndSignal
 
 save refinedMean.mat refinedMean
+save refinedSum.mat refinedSum
 save bkg.mat bkg
 save refinedArea.mat refinedArea
 save touchBorder.mat touchBorder
 
-
-%% plot trace i
+%% plot mean signal 1 and 2 of trace i with std
 
 i=1
 
 clfh
 sel = ind(longTraces(i),:) > 0;
-errorbar(refinedMean(longTraces(i),sel,1),refinedStd(longTraces(i),sel,1),'r');
-errorbar(refinedMean(longTraces(i),sel,2),refinedStd(longTraces(i),sel,2),'g');
+col = {'r','g'};
+for k=1:min(2,expe.numberOfColors)
+    errorbar(expe.t(sel),refinedMean(longTraces(i),sel,k),refinedStd(longTraces(i),sel,k),col{k});
+end
+
+xlabel('time')
+
+%% plot mean signal 1, trace i 
+
+i=1
+
+clfh
+sel = ind(longTraces(i),:) > 0;
+plot(expe.t(sel),refinedMean(longTraces(i),sel,1),'r');
+%plot(expe.t(sel),refinedMean(longTraces(i),sel,2),'g');
 
 
-%% plot trajectories for onur
+%% plot sum of signal 1, trace i 
+
+i=1
+
+clfh
+sel = ind(longTraces(i),:) > 0;
+plot(expe.t(sel),refinedSum(longTraces(i),sel,1),'r');
+%plot(expe.t(sel),refinedSum(longTraces(i),sel,2),'g');
+
+%% plot area and division trace i 
+
+i=1
+
+clfh
+sel = ind(longTraces(i),:) > 0;
+plot(expe.t(sel),imnorm(areaMatrix(longTraces(i),sel,1)),'k');
+plot(expe.t(sel),0.5*divMatrix(longTraces(i),sel),'r');
+
+legend('area','divisions')
+
+%% plot trajectories 
 
 clfh
 for i=1:size(ind,1)
@@ -443,6 +328,12 @@ doDraw = 0;
 inputFolder = 'zStackedYFP/';
   
 makeImagesForTraceTool
+
+
+%% delete peakMatrixFinal and divMatrixFinal (reset guiTraces)
+
+%!rm divMatrixFinal.mat
+%!rm peakMatrixFinal.mat
 
 %% Traces tool, correct divs and peaks
 
