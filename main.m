@@ -15,12 +15,10 @@ movie = 1;
 outDir = [mainDir '/movie' num2str(movie) '/'];
 cd(outDir)
 
-
 addpath ../
 addpath ../code
 addpath ../code/regionbased_seg
 set(0,'defaultlinelinewidth',2)
-
 
 %% combine stacks, denoise, ...
 
@@ -40,7 +38,6 @@ doDraw = 1;
 mkdirIfNotExist('zStackedYFP');
 mkdirIfNotExist('zStackedYFP_Data');
 
-
 for k=1:N
 
     disp(100*k/N);
@@ -51,8 +48,7 @@ for k=1:N
     end
             
     [out,N1,N2] = combineStack(imagesPath,Nz,deNoise,medianSize,compressionQuantile,gaussianFilterSize,weightsSegmentation,doDraw);
-    imwrite(out,['zStackedYFP/' num2str(k) '.png']);
-        
+    imwrite(out,['zStackedYFP/' num2str(k) '.png']);        
 end
 
 %% just display the combined images
@@ -157,7 +153,7 @@ clf;
 plot(nObj)
 ylabel('number of objects')
 
-%% tweak tracking parameters
+%% tweak tracking parameters if needed
 % main parameters are frame_displacement and split_cost
 
 edit('get_struct.m');
@@ -174,11 +170,10 @@ Me = loadMeasures(N);
 
 clf; imagesc( signal(:,:,1) ); colormap jet
 
-%%
+%% reload things if needed
 
 load tracks.mat 
 load signal.mat 
-
 load traj.mat
 load ind.mat 
 load divisions.mat 
