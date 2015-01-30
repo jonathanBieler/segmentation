@@ -18,7 +18,7 @@ expe.colorNames = {'FITC'};
 expe.hasTrans = 0;
 expe.transName = 'Trans';
 
-expe.imgDir = '/Users/bieler/Desktop/moviesAndrea/onur/';
+expe.imgDir = '/Users/bieler/Desktop/movies/';
 
 expe.mainDir = '/Users/bieler/Desktop/matlab/segmentation2';
 

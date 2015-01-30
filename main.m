@@ -39,7 +39,7 @@ N = expe.numberOfFrames;
 Nz = expe.numberOfColors; %number of images to combine
 
 deNoise = {'none','BM3D','median','localNorm'}; %denoise algo on each stack
-deNoise = deNoise{1};
+deNoise = deNoise{3};
 
 medianSize = 3;
 
@@ -47,7 +47,7 @@ weightsSegmentation = [1 1 1]; %weights for summing the different channels
 compressionQuantile = 1;      %signal above this quantile will be cut off, set to 1 to disable
 gaussianFilterSize = 50;         %typycal length of the background
 
-temporalBinning = 10;
+temporalBinning = 1;
 
 doDraw = 1;
 
@@ -273,13 +273,13 @@ makePeakAndDivMatrices
 
 %% refine area and signal around each cell, and do images for guiTraces
 
-doDrawBkg = 0;  %display there area where the background is measured 
+doDrawBkg = 1;  %display there area where the background is measured 
 doDraw = 0;     %display area refinement result
 
 bgkSize = 5;    %size around the cell where the background is not quantified
 superSampling = 1; %increase the resolution of the image
 
-NIteration = 20; % Number of iteration of the area refinement algorithm, increase when using temporal binning
+NIteration = 15; % Number of iteration of the area refinement algorithm, increase when using temporal binning
 
 s = 30; %size of the window around the cells
 
