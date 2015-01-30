@@ -5,12 +5,19 @@ mkdirIfNotExist('Measures')
 
 nObj=zeros(1,N);
 
+if(exist('zStackedYFP_unbinned','dir'))    
+   temporalBinning =  round( length( dir('zStackedYFP_unbinned/*.png') ) ./ length( dir('zStackedYFP/*.png') ));   
+else
+   temporalBinning = 1;
+end
+
 for k=1:N
     
     disp(100*k/N);
     
+    a = {};
     for i=1:expe.numberOfColors
-        a{i} = imread(['img/' getImageName(expe.colorNames{i},k)]);         
+        a{i} = imread(['img/' getImageName(expe.colorNames{i}, (k-1)*temporalBinning + 1 )]);         
     end
     
     b = imread([threshFolder num2str(k) '.png']);
@@ -48,3 +55,5 @@ for k=1:N
     nObj(k)=length(Measurements);
 end
 
+
+disp(['Temporal binning=' n2s(temporalBinning)])

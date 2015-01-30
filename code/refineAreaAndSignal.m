@@ -1,14 +1,17 @@
+mkdirIfNotExist('zStackedThreshCorrectedRefined')
+ 
+
+
 for n=1:length(longTraces)
         
     idx = longTraces(n);        
 
     clf;
 
-    s = 40;
-
+   
     w=2*s+1;
     nR = 6;
-    tot = NToTrack;
+    tot = N;
 
     d = round(tot/nR);
     out = zeros(d*w,nR*w);
@@ -17,6 +20,11 @@ for n=1:length(longTraces)
     %j = round(traj{idx}(:,2));
     
     for k=1:N
+        
+        if( ~exist(['zStackedThreshCorrectedRefined/' num2str(k) '.png'],'file') )
+            m = imread(['zStackedThreshCorrected/' num2str(k) '.png']);
+            imwrite(m<-1,['zStackedThreshCorrectedRefined/' num2str(k) '.png']);
+        end
 
         k
         if( ind(idx,k)~=0 )
@@ -28,6 +36,8 @@ for n=1:length(longTraces)
             end
                         
             m = imread(['zStackedThreshCorrected/' num2str(k) '.png']);
+            mrefined = imread(['zStackedThreshCorrectedRefined/' num2str(k) '.png']);
+            
             name = ['Measures/' num2str(k) '.mat'];
                 
             pos = Me{k}(ind(idx,k)).Centroid;
@@ -103,10 +113,13 @@ for n=1:length(longTraces)
             end
            
             if(updateArea)
-                seg = region_seg(sub_a, m, 12,0.8,doDraw && mod(k,1)==0); %-- Run segmentation
+                seg = region_seg(sub_a, m, NIteration,0.8,doDraw && mod(k,1)==0); %-- Run segmentation
             else
                 seg = m;   
             end
+            
+            mrefined(selj,seli) = mrefined(selj,seli)  +  imresize(seg,1./superSampling);
+            imwrite(mrefined,['zStackedThreshCorrectedRefined/' num2str(k) '.png']);
 
             %
             tmp = imclearborder(seg);
@@ -119,8 +132,8 @@ for n=1:length(longTraces)
             for j=1:expe.numberOfColors  
                 
                 tmp = double(sub_data{j}(seg==1));            
-                %qu = quantile(tmp,0.95);    ql = quantile(tmp,0.05);
-                %tmp = tmp(  (tmp < qu) & (tmp > ql) );
+                qu  = quantile(tmp,0.95);    ql = quantile(tmp,0.05);
+                tmp = tmp(  (tmp < qu) & (tmp > ql) );
 
                 refinedMean(idx,k,j)    = mean(tmp);
                 refinedSum(idx,k,j)     = sum(tmp);

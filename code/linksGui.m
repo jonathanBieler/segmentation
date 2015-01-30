@@ -125,6 +125,9 @@ function linksGui_OpeningFcn(hObject, eventdata, handles, varargin)
     if( ~exist('links.mat','file') )
         handles.seg = 0;
         doLinksOnly = 1;
+        
+        Nframes = length(dir('zStackedThreshSplit/*.png'));
+        
         disp('Doing the initial tracking')
         updateTracking_Callback(0, eventdata, handles,doLinksOnly);    
         %edit4_Callback(hObject, eventdata, handles)
@@ -1106,11 +1109,11 @@ function updateTracking_Callback(hObject, eventdata, handles, doLinksOnly)
         doLinksOnly = get(handles.doLinksOnly,'value');
         
     end
-    
-    
+        
 
-    global Nframes k moviePath;    
+    global Nframes k moviePath;  
     seg = handles.seg;
+    
        
     threshFolder = 'zStackedThreshCorrected/';
     

@@ -6,7 +6,7 @@ expe=struct();
 
 %% change this
 
-expe.numberOfFrames = 59;
+expe.numberOfFrames = 200;
 expe.dt = 0.5;
 
 expe.numberOfMovies = 1;
@@ -18,7 +18,7 @@ expe.colorNames = {'FITC'};
 expe.hasTrans = 0;
 expe.transName = 'Trans';
 
-expe.imgDir = '/Users/bieler/Desktop/moviesAndrea/RALYTest/';
+expe.imgDir = '/Users/bieler/Desktop/moviesAndrea/onur/';
 
 expe.mainDir = '/Users/bieler/Desktop/matlab/segmentation2';
 

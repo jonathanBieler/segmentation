@@ -25,7 +25,7 @@ for k=1:1:NToTrack
     for i=1:length(div)
         pos=traj{div(i)};
         
-        text(pos(k,1),pos(k,2),'Boom!','color','green')
+        text(pos(k,1),pos(k,2),'Boom!','color','green','fontSize',18)
         
     end
     
@@ -47,4 +47,6 @@ for k=1:1:NToTrack
     drawnow    
     pause(pauseTime);
 end
+
+hold off
 

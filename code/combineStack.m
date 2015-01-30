@@ -96,8 +96,9 @@ if( ~strcmp( deNoise, 'localNorm') )
 end
 
 if doDraw    
+    clf
     imagesc(out.^1)
-    pause(0.1)    
+    pause(0.05)    
 end
 
 

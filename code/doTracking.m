@@ -1,7 +1,7 @@
 function [tracks, signal, traj, ind, divisions, divPerframe, trajX, trajY] = doTracking(N, Me,doLinksOnly)
 
 
-weigth = 0.03*[1/5 1/8 1]; %weights of the different signals (two here) and the area 
+weigth = 0.03*[1/20 1/4 1]; %weights of the different signals (two here) and the area 
 
 %define data given to the tracking algo
 nuclei = struct;

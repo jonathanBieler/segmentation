@@ -3,8 +3,11 @@ for n=1:length(longTraces)
     idx = longTraces(n);
     disp(100*n / length(longTraces));
     
-    i = round(traj{idx}(:,1));
-    j = round(traj{idx}(:,2));
+    %i = round(traj{idx}(:,1));
+    %j = round(traj{idx}(:,2));
+    
+    i = round(trajX(idx,:));
+    j = round(trajY(idx,:));
 
     clf;
 
@@ -38,7 +41,9 @@ for n=1:length(longTraces)
         
     end
     
-    for k=nonZeroIdx:NToTrack
+    %%
+    
+    for k=nonZeroIdx:N
                
         a = imread([inputFolder num2str(k) '.png']);
         m = imread(['zStackedThreshCorrected/' num2str(k) '.png']);
@@ -69,7 +74,7 @@ for n=1:length(longTraces)
             
             if(doDraw)
                 imagesc(sub_a); drawnow;
-                %pause(0.1)
+                pause(0.1)
             end
                     
         end

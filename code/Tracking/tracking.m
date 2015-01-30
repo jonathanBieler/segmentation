@@ -247,9 +247,9 @@ if( ~doLinksOnly )
   toc
 
   for i=1:nends+ninterm
-    if (assign(i) <= nstarts)
+    if (assign(i) <= nstarts && assign(i) > 0)
       target = starts(assign(i), :);
-    elseif (assign(i) < nstarts + ninterm)
+    elseif (assign(i) < nstarts + ninterm && assign(i) > 0)
       target = interm(assign(i) - nstarts, :);
     else
       continue;

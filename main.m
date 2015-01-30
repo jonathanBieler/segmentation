@@ -20,46 +20,82 @@ addpath ../code
 addpath ../code/regionbased_seg
 set(0,'defaultlinelinewidth',2)
 
+%% delete everything, if you want to reset the movie and start from scratch
+
+% !rm zStackedThreshCorrected/*.png
+% !rm zStackedThreshSplit/*.png
+% !rm zStackedThresh/*.png
+% !rm zStackedYFP/*.png
+% !rm links.mat
+% !rm zStackedYFP_unbinned/*.png
+% !rm segPara.mat
+% !rm segParaFrames.mat
+% !rm divMatrixFinal.mat
+% !rm peakMatrixFinal.mat
+
 %% combine stacks, denoise, ...
 
+N = expe.numberOfFrames;
 Nz = expe.numberOfColors; %number of images to combine
 
 deNoise = {'none','BM3D','median','localNorm'}; %denoise algo on each stack
-deNoise = deNoise{3};
+deNoise = deNoise{1};
 
 medianSize = 3;
 
 weightsSegmentation = [1 1 1]; %weights for summing the different channels
-compressionQuantile = 0.99;      %signal above this quantile will be cut off, set to 1 to disable
+compressionQuantile = 1;      %signal above this quantile will be cut off, set to 1 to disable
 gaussianFilterSize = 50;         %typycal length of the background
+
+temporalBinning = 10;
 
 doDraw = 1;
 
 mkdirIfNotExist('zStackedYFP');
-mkdirIfNotExist('zStackedYFP_Data');
 
-for k=1:N
+for k=1:N/temporalBinning
 
-    disp(100*k/N);
+    disp(100*k/N*temporalBinning);
           
     images = {};
     for i=1:Nz
-        imagesPath{i} = [outDir 'img/' getImageName(expe.colorNames{i},k)];
+        for j=1:temporalBinning                        
+            images{i} = [outDir 'img/' getImageName(expe.colorNames{i},(k-1)*temporalBinning + j)];
+        end
     end
             
-    [out,N1,N2] = combineStack(imagesPath,Nz,deNoise,medianSize,compressionQuantile,gaussianFilterSize,weightsSegmentation,doDraw);
-    imwrite(out,['zStackedYFP/' num2str(k) '.png']);        
+    [out,N1,N2] = combineStack(images,Nz,deNoise,medianSize,compressionQuantile,gaussianFilterSize,weightsSegmentation,doDraw);
+    imwrite(out,['zStackedYFP/' num2str(k) '.png']);
 end
+
+% combine at real framerate for later
+if temporalBinning > 1
+    mkdirIfNotExist('zStackedYFP_unbinned');    
+        
+    for k=1:N
+        disp(100*k/N);
+        images = {};
+        for i=1:Nz
+            images{i} = [outDir 'img/' getImageName(expe.colorNames{i},k)];
+        end
+
+        [out,N1,N2] = combineStack(images,Nz,deNoise,medianSize,compressionQuantile,gaussianFilterSize,weightsSegmentation,doDraw);
+        imwrite(out,['zStackedYFP_unbinned/' num2str(k) '.png']);
+    end
+    
+end
+
+N = floor(N/temporalBinning);
 
 %% just display the combined images
 
 clf;colormap jet
 for k=1:N
     
-        disp(100*k/N)                 
-        a = imread(['zStackedYFP/' num2str(k) '.png']);        
-        imagesc(a); caxis([0 250])        
-        pause(0.08); drawnow;        
+    disp(100*k/N)                 
+    a = imread(['zStackedYFP/' num2str(k) '.png']);        
+    imagesc(a); caxis([0 250])        
+    pause(0.08); drawnow;        
 end
 
 %% test segmentation on a few frames 
@@ -136,7 +172,7 @@ if doDraw
          b = double(b);
 
          imagesc(a+b);
-         pause(0.01)
+         pause(0.03)
     end
 end
 
@@ -184,6 +220,10 @@ pauseTime = 0.1;
 
 plotTracking;
 
+%% revert temporal binning: go back to full framerate (cannot undo)
+
+revertTemporalBinning
+
 %% select good traces, based on length
 
 lengthOfTrace = zeros(size(ind,1),1);
@@ -194,7 +234,7 @@ indAnnotation = zeros(size(ind));
 if( exist('lengthThresh.mat','file') )
     load lengthThresh.mat;
 else
-    lengthThresh = 0.3; %note: to change lengthThresh value you first need to delete the file if it exists: !rm lengthThresh.mat
+    lengthThresh = 0.9; %note: to change lengthThresh value you first need to delete the file if it exists: !rm lengthThresh.mat
 end
 
 for i=1:size(ind,1)
@@ -207,7 +247,7 @@ for i=1:size(ind,1)
     
 end
 
-longTraces = find( (lengthOfGaps < 1) .* (lengthOfTrace/NToTrack>lengthThresh) );
+longTraces = find( (lengthOfGaps < 1) .* (lengthOfTrace/N>lengthThresh) );
 clf
 
 A = signal(longTraces,:);
@@ -236,12 +276,16 @@ makePeakAndDivMatrices
 doDrawBkg = 0;  %display there area where the background is measured 
 doDraw = 0;     %display area refinement result
 
-bgkSize = 4;    %size around the cell where the background is not quantified
+bgkSize = 5;    %size around the cell where the background is not quantified
 superSampling = 1; %increase the resolution of the image
+
+NIteration = 20; % Number of iteration of the area refinement algorithm, increase when using temporal binning
+
+s = 30; %size of the window around the cells
 
 mkdirIfNotExist('snapShots')
 
-NToTrack = N;
+
 a = imread(['zStackedYFP/' num2str(1) '.png']);
 N1=size(a,1);
 N2=size(a,2);
@@ -263,6 +307,28 @@ save bkg.mat bkg
 save refinedArea.mat refinedArea
 save touchBorder.mat touchBorder
 
+%% make small images around each cell for the trace tool 
+% use if you don't want to do the refine area thing above
+
+mkdirIfNotExist('snapShots')
+
+doDraw = 1;
+inputFolder = 'zStackedYFP/';
+  
+makeImagesForTraceTool
+
+
+%% delete peakMatrixFinal and divMatrixFinal (reset guiTraces)
+
+%!rm divMatrixFinal.mat
+%!rm peakMatrixFinal.mat
+
+%% Traces tool, correct divs and peaks
+
+guiTraces
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% MAKE SOME PLOTS %%%%%%%%%%%%%%%%%%%%%%%
 %% plot mean signal of trace i with std
 
 i=1
@@ -283,12 +349,13 @@ i=1
 clfh
 sel = ind(longTraces(i),:) > 0;
 plot(expe.t(sel),refinedMean(longTraces(i),sel,1),'r');
+plot(expe.t(sel),bkg(longTraces(i),sel,1),'r--');
 %plot(expe.t(sel),refinedMean(longTraces(i),sel,2),'g');
 
 
 %% plot sum of signal, trace i 
 
-i=1
+i=2
 
 clfh
 sel = ind(longTraces(i),:) > 0;
@@ -301,7 +368,7 @@ i=1
 
 clfh
 sel = ind(longTraces(i),:) > 0;
-plot(expe.t(sel),imnorm(areaMatrix(longTraces(i),sel,1)),'k');
+plot(expe.t(sel),imnorm(refinedArea(longTraces(i),sel,1)),'k');
 plot(expe.t(sel),0.5*divMatrix(longTraces(i),sel),'r');
 
 legend('area','divisions')
@@ -311,28 +378,9 @@ legend('area','divisions')
 clfh
 for i=1:size(ind,1)
     sel= ind(i,:)>0;
-    plot(trajX(i,sel),trajY(i,sel),'color',rand(3,1))
+    plot(trajX(i,sel),trajY(i,sel),'.','color',rand(3,1))
 end
 
-%% make small images around each cell for the trace tool 
-% use if you don't want to do the refine area thing above
-
-mkdirIfNotExist('snapShots')
-
-doDraw = 0;
-inputFolder = 'zStackedYFP/';
-  
-makeImagesForTraceTool
-
-
-%% delete peakMatrixFinal and divMatrixFinal (reset guiTraces)
-
-%!rm divMatrixFinal.mat
-%!rm peakMatrixFinal.mat
-
-%% Traces tool, correct divs and peaks
-
-guiTraces
 
 %% Load corrected peaks and divs
 

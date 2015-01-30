@@ -66,71 +66,71 @@ divMatrix = zeros(size(ind));
 
 k = 1;
 
-    for i=1:length(longTraces)
+for i=1:length(longTraces)
 
-        idx = longTraces(i);
-        tmp = signal(idx,:,k);
+    idx = longTraces(i);
+    tmp = signal(idx,:,k);
 
-        %tracking division
-        if(~isempty(divisions) )
-            
-            dd = find([divisions.motherInd] == idx);
-            for j=1:length(dd)
+    %tracking division
+    if(~isempty(divisions) )
 
-                ff = divisions(dd(j)).motherFrame;        
-                divMatrix(idx,ff,k)=1;
-            end
+        dd = find([divisions.motherInd] == idx);
+        for j=1:length(dd)
 
-            dd = find([divisions.sisterInd] == idx);    
-            for j=1:length(dd)
-
-                ff = divisions(dd(j)).sisterFrame;        
-                divMatrix(idx,ff,k)=1;        
-            end
-        
+            ff = divisions(dd(j)).motherFrame;        
+            divMatrix(idx,ff,k)=1;
         end
 
-        %detect from trace with low false neg (hopefully)
-        maxp = getDivisionsFromTrace(tmp,1,0.1);
-        for j=1:size(maxp,1)
+        dd = find([divisions.sisterInd] == idx);    
+        for j=1:length(dd)
 
-            %check if there is no division already close by          
-            sel = (maxp(j,1)-4):(maxp(j,1)+4);
-            sel = sel(sel>0); sel = sel(sel <= size(ind,2));
-
-            if( sum( divMatrix(idx,sel,k)) == 0) 
-                divMatrix(idx,maxp(j,1),k)=1;
-            end
-
+            ff = divisions(dd(j)).sisterFrame;        
+            divMatrix(idx,ff,k)=1;        
         end
 
-        %correct divisions that are too close in time    
-        divs = find(divMatrix(idx,:,k));    
-        for j=1:length(divs)-1
+    end
 
-            div2divTime = expe.t(divs(j+1))-expe.t(divs(j));        
-            if( div2divTime < minTimeBetweenDivisions)           
+    %detect from trace with low false neg (hopefully)
+    maxp = getDivisionsFromTrace(tmp,1,0.1);
+    for j=1:size(maxp,1)
 
-                    tmp = fillTrace(tmp);
-                    tmp = imnorm(tmp);
+        %check if there is no division already close by          
+        sel = (maxp(j,1)-4):(maxp(j,1)+4);
+        sel = sel(sel>0); sel = sel(sel <= size(ind,2));
 
-                    f = [1 1 -5 1 1];
-                    pe = conv(tmp,f,'same');
-                    pe(pe<0)=0;
-                    pe = smooth(smooth(pe,3)); %%allow for small time differences
+        if( sum( divMatrix(idx,sel,k)) == 0) 
+            divMatrix(idx,maxp(j,1),k)=1;
+        end
 
-                    score1 = pe(divs(j));                
-                    score2 = pe(divs(j+1));
+    end
 
-                    if(score1 >= score2)                   
-                        divMatrix(idx,divs(j+1),k) = 0;
-                    else
-                        divMatrix(idx,divs(j),k) = 0;
-                    end
+    %correct divisions that are too close in time    
+    divs = find(divMatrix(idx,:,k));    
+    for j=1:length(divs)-1
 
-            end
+        div2divTime = expe.t(divs(j+1))-expe.t(divs(j));        
+        if( div2divTime < minTimeBetweenDivisions)           
+
+                tmp = fillTrace(tmp);
+                tmp = imnorm(tmp);
+
+                f = [1 1 -5 1 1];
+                pe = conv(tmp,f,'same');
+                pe(pe<0)=0;
+                pe = smooth(smooth(pe,3)); %%allow for small time differences
+
+                score1 = pe(divs(j));                
+                score2 = pe(divs(j+1));
+
+                if(score1 >= score2)                   
+                    divMatrix(idx,divs(j+1),k) = 0;
+                else
+                    divMatrix(idx,divs(j),k) = 0;
+                end
+
         end
     end
+end
 
 
 clf
