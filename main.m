@@ -20,7 +20,8 @@ addpath ../code
 addpath ../code/regionbased_seg
 set(0,'defaultlinelinewidth',2)
 
-%% delete everything, if you want to reset the movie and start from scratch
+%% run these commands to delete everything, if you want to reset the movie
+% and start from scratch, (command-t to uncomment)
 
 % !rm zStackedThreshCorrected/*.png
 % !rm zStackedThreshSplit/*.png
@@ -307,6 +308,13 @@ save bkg.mat bkg
 save refinedArea.mat refinedArea
 save touchBorder.mat touchBorder
 
+%% note: if you used temporal stacking > 1 and you want to use linksGui at
+% full framerate you can copy over segmentation images, redo the measures and the tracking and then start
+% linksGui
+
+%!cp zStackedThreshCorrectedRefined/*.png zStackedThreshSplit/
+%!cp zStackedThreshCorrectedRefined/*.png zStackedThreshCorrected/
+
 %% make small images around each cell for the trace tool 
 % use if you don't want to do the refine area thing above
 
@@ -316,7 +324,6 @@ doDraw = 1;
 inputFolder = 'zStackedYFP/';
   
 makeImagesForTraceTool
-
 
 %% delete peakMatrixFinal and divMatrixFinal (reset guiTraces)
 
