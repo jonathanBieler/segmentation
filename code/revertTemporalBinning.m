@@ -33,6 +33,7 @@ for i = 1:No
             a = a+b > 0;
     end
     
+    clf
     imagesc(a)
     drawnow
     colormap jet
@@ -84,13 +85,22 @@ ind  = ind2;
 [ip jp] = meshgrid(linspace(1,size(signal,2),No),1:size(signal,1)) ;
 
 %ind = interp2(i,j,ind,ip,jp,'nearest');
-signal = interp2(i,j,signal,ip,jp,'nearest');
-trajX = interp2(i,j,trajX,ip,jp,'linear');
-trajY = interp2(i,j,trajY,ip,jp,'linear');
+signal_ = zeros( [size(ind) expe.numberOfColors] );
+trajX_  = zeros( [size(ind) ] );
+trajY_  = zeros( [size(ind) ] );
+for k=1:expe.numberOfColors
+    signal_(:,:,k) = interp2(i,j,signal(:,:,k),ip,jp,'nearest');
+    trajX_ = interp2(i,j,trajX,ip,jp,'linear');
+    trajY_ = interp2(i,j,trajY,ip,jp,'linear');
+end
+
+signal = signal_;
+trajX = trajX_;
+trajY = trajY_;
 
 N = No;
 
-clf; imagesc(signal); colormap jet
+clf; imagesc(signal(:,:,1)); colormap jet
 
 %% transform divisions into unbinned time
 
