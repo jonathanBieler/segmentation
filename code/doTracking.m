@@ -294,7 +294,8 @@ end
 %%
 
 
-
+save trajX.mat trajX
+save trajY.mat trajY
 save tracks.mat tracks
 save signal.mat signal
 save traj.mat traj

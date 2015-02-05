@@ -1,4 +1,5 @@
-function Me = loadMeasures(N);
+% Me = loadMeasures(N)
+function Me = loadMeasures(N)
 
 Me = cell(1,N);
 

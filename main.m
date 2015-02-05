@@ -274,15 +274,16 @@ makePeakAndDivMatrices
 
 %% refine area and signal around each cell, and do images for guiTraces
 
-doDrawBkg = 1;  %display there area where the background is measured 
+doDrawBkg = 0;  %display there area where the background is measured 
 doDraw = 0;     %display area refinement result
 
 bgkSize = 5;    %size around the cell where the background is not quantified
-superSampling = 1; %increase the resolution of the image
+superSampling = 1; %increase the resolution of the image (must be an integer)
 
-NIteration = 15; % Number of iteration of the area refinement algorithm, increase when using temporal binning
+NIteration = 40; % Number of iteration of the area refinement algorithm, increase when using temporal binning
+dilateSizeAfterRefine = 1; %if >=1 dilate a bit the area after the refinement
 
-s = 30; %size of the window around the cells
+s = 20; %size of the window around the cells
 
 mkdirIfNotExist('snapShots')
 
@@ -304,6 +305,7 @@ refineAreaAndSignal
 
 save refinedMean.mat refinedMean
 save refinedSum.mat refinedSum
+save refinedStd.mat refinedStd
 save bkg.mat bkg
 save refinedArea.mat refinedArea
 save touchBorder.mat touchBorder
@@ -336,6 +338,14 @@ guiTraces
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% MAKE SOME PLOTS %%%%%%%%%%%%%%%%%%%%%%%
+
+%% reload everythin if needed
+
+f = dir('*.mat');
+for i=1:length(f)
+    load(f(i).name);
+end
+
 %% plot mean signal of trace i with std
 
 i=1
@@ -397,9 +407,18 @@ load peakMatrixFinal.mat
 clf
 imagesc(peakMatrix(:,:,1)-divMatrix)
 
-%%
+%% make nice time plot with images
 
+idx = longTraces(4)
 
+signalToPlot = refinedSum(:,:,1); %which signal to plot
+colorIndex = 1; %which images to show
+showSeg = 1;
+
+s  = 8;    % size of window around the cell
+nR = 10;    % number of rows in the image
+
+makeImageTimePlot
 
 
 

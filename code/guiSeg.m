@@ -216,7 +216,6 @@ function [] = doSegment(handles)
     b = imread( ['zStackedThresh/' num2str(imInd) '.png'] );
 
     %superpose both
-    %b = (edge(b,'log',0));
     b = bwmorph(b,'remove');
 
 

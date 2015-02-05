@@ -4,10 +4,11 @@ mkdirIfNotExist('zStackedThreshCorrectedRefined')
 
 for n=1:length(longTraces)
         
+    %n = 3
     idx = longTraces(n);        
 
     clf;
-
+    disp(100*n/length(longTraces))
    
     w=2*s+1;
     nR = 6;
@@ -21,12 +22,14 @@ for n=1:length(longTraces)
     
     for k=1:N
         
+        
+        %%
         if( ~exist(['zStackedThreshCorrectedRefined/' num2str(k) '.png'],'file') )
             m = imread(['zStackedThreshCorrected/' num2str(k) '.png']);
             imwrite(m<-1,['zStackedThreshCorrectedRefined/' num2str(k) '.png']);
         end
 
-        k
+        
         if( ind(idx,k)~=0 )
             a = imread(['zStackedYFP/' num2str(k) '.png']);
 
@@ -101,7 +104,7 @@ for n=1:length(longTraces)
                 updateArea = 0;
             end
             
-            %m = imdilate(m,strel('disk',1));   
+            m = imdilate(m,strel('disk',3));   
     
             if( superSampling > 1)
                 sub_a = imresize(sub_a,superSampling);
@@ -113,9 +116,17 @@ for n=1:length(longTraces)
             end
            
             if(updateArea)
-                seg = region_seg(sub_a, m, NIteration,0.8,doDraw && mod(k,1)==0); %-- Run segmentation
+                seg = region_seg(sub_a, m, NIteration,0.6,doDraw && mod(k,1)==0); %-- Run segmentation
             else
                 seg = m;   
+            end
+            
+            if( sum(seg(:)) == 0 )
+                seg = m;
+            end
+            
+            if( dilateSizeAfterRefine >= 1 )
+                seg = imdilate(seg,strel('disk',dilateSizeAfterRefine));
             end
             
             mrefined(selj,seli) = mrefined(selj,seli)  +  imresize(seg,1./superSampling);
@@ -132,8 +143,8 @@ for n=1:length(longTraces)
             for j=1:expe.numberOfColors  
                 
                 tmp = double(sub_data{j}(seg==1));            
-                qu  = quantile(tmp,0.95);    ql = quantile(tmp,0.05);
-                tmp = tmp(  (tmp < qu) & (tmp > ql) );
+                %qu  = quantile(tmp,0.99);    ql = quantile(tmp,0.01);
+                %tmp = tmp(  (tmp < qu) & (tmp > ql) );
 
                 refinedMean(idx,k,j)    = mean(tmp);
                 refinedSum(idx,k,j)     = sum(tmp);
@@ -150,6 +161,8 @@ for n=1:length(longTraces)
             %save image as png for GUI
             imwrite(sub_a,['snapShots/' num2str(idx) '_' num2str(k) '.png']);
 
+            
+            
         end      
     end
     
