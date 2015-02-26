@@ -6,21 +6,21 @@ expe=struct();
 
 %% change this
 
-expe.numberOfFrames = 200;
-expe.dt = 0.5;
+expe.numberOfFrames = 658;
+expe.dt = 1/12;
 
 expe.numberOfMovies = 1;
 expe.indexOfFirstMovie = 1;
 
-expe.numberOfColors = 1;
-expe.colorNames = {'FITC'};
+expe.numberOfColors = 2;
+expe.colorNames = {'YFP','TexasRed'};
 
 expe.hasTrans = 0;
 expe.transName = 'Trans';
 
-expe.imgDir = '/Users/bieler/Desktop/movies/';
+expe.imgDir = '/Volumes/Backup/2015_19_02_Rosie_Venus_H2B_Z_stacks_1/d3/';
 
-expe.mainDir = '/Users/bieler/Desktop/matlab/segmentation2';
+expe.mainDir = '/Users/bieler/Desktop/matlab/histoneStuff/2015_19_02_Rosie_Venus_H2B_Z_stacks_1';
 
 %% don't change that
 

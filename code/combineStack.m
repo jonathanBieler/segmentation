@@ -6,7 +6,9 @@ a = imread(names{1});
 
 a = zeros(N1,N2,Nz);
 
-H = fspecial('gaussian',300,gaussianFilterSize);
+if( gaussianFilterSize > 0 )
+    H = fspecial('gaussian',300,gaussianFilterSize);
+end
     
 
 for i=1:Nz
@@ -21,7 +23,11 @@ for i=1:Nz
     tmp(tmp>q)=q;
 
     %highpass filter to homogenize the backgroud
-    tmp = a(:,:,i) - imfilter(tmp,H,'symmetric'); 
+    if( gaussianFilterSize > 0 )
+        tmp = a(:,:,i) - imfilter(tmp,H,'symmetric'); 
+    else
+        tmp = a(:,:,i);
+    end
     
     q = quantile(tmp(:),compressionQuantile);
     tmp(tmp>q)=q; 

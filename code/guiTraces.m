@@ -148,7 +148,12 @@ function  updatePlotGif()
     if(exist(['snapShots/' num2str(longTraces(k)) '_' num2str(t) '.png'],'file'))
         im = imread(['snapShots/' num2str(longTraces(k)) '_' num2str(t) '.png']);
         imagesc(im);
-        caxis([caxisMin,caxisMax])
+        if( caxisMax > 0 )
+            caxis([caxisMin,caxisMax])
+        else
+            p=0.001;
+            caxis([quantile(im(:),p),quantile(im(:),1-p)])
+        end
         set(axesGif,'visible','off')
     end
 
@@ -228,7 +233,7 @@ function KeyPress(Source, EventData)
         %add peak        
         case 'e'
             
-            sel = max(t-5,1):min(t+5,Nframes);            
+            sel = max(t-0,1):min(t+0,Nframes);            
             peakMatrix(longTraces(k),sel,signalIndex) = 0;
             peakMatrix(longTraces(k),t,signalIndex) = 1;
             

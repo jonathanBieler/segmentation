@@ -413,7 +413,7 @@ switch EventData.Character
        i = max(i,1); j = max(j,1);             
        i = min(i,N2); j = min(j,N1);
        
-       [seli selj] = getNeiInd(j,i,20,N2,N1);
+       [seli selj] = getNeiInd(j,i,60,N2,N1);
               
        sub_seg = imnorm( a(seli,selj) );                   
        th = quantile(sub_seg(:),str2double( get(handles.edit3,'String')) );       

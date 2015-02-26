@@ -1,6 +1,6 @@
 %% experiment paramaters
 
-cd /Users/bieler/Desktop/matlab/segmentation2
+cd /Users/bieler/Desktop/matlab/histoneStuff/2015_19_02_Rosie_Venus_H2B_Z_stacks_1
 
 expe = experimentPara();
 
@@ -19,6 +19,33 @@ addpath ../
 addpath ../code
 addpath ../code/regionbased_seg
 set(0,'defaultlinelinewidth',2)
+
+%% reduce image resolution
+
+binsize = 4;
+
+if( binsize > 1 )
+mkdirIfNotExist('fullSizeimg');
+system(['cp -v img/*.png fullSizeimg']);
+
+%
+for j=1:expe.numberOfColors
+    for k=1:N
+
+        disp(100*k/N);
+        
+        a = imread([outDir 'fullSizeimg/' getImageName(expe.colorNames{j},k) ]);
+        a = binImage(a,binsize);
+        %imagesc(a)
+        %drawnow
+
+        imwrite(uint16(a),[outDir 'img/' getImageName(expe.colorNames{j},k) ]);
+        
+    end
+end
+
+end
+
 
 %% run these commands to delete everything, if you want to reset the movie
 % and start from scratch, (command-t to uncomment)
@@ -40,15 +67,15 @@ N = expe.numberOfFrames;
 Nz = expe.numberOfColors; %number of images to combine
 
 deNoise = {'none','BM3D','median','localNorm'}; %denoise algo on each stack
-deNoise = deNoise{3};
+deNoise = deNoise{1};
 
 medianSize = 3;
 
 weightsSegmentation = [1 1 1]; %weights for summing the different channels
-compressionQuantile = 1;      %signal above this quantile will be cut off, set to 1 to disable
-gaussianFilterSize = 50;         %typycal length of the background
+compressionQuantile = 0.99;       %signal above this quantile will be cut off, set to 1 to disable
+gaussianFilterSize = 40;       %typycal length of the background
 
-temporalBinning = 1;
+temporalBinning = 4;
 
 doDraw = 1;
 
@@ -153,7 +180,7 @@ mkdirIfNotExist(saveFolder)
 
 doDraw = 0;
 
-threshold = 1.6; %low value -> split everything
+threshold = 1.8; %low value -> split everything
 
 splitMergeCells;
 
@@ -235,7 +262,7 @@ indAnnotation = zeros(size(ind));
 if( exist('lengthThresh.mat','file') )
     load lengthThresh.mat;
 else
-    lengthThresh = 0.9; %note: to change lengthThresh value you first need to delete the file if it exists: !rm lengthThresh.mat
+    lengthThresh = 0.6; %note: to change lengthThresh value you first need to delete the file if it exists: !rm lengthThresh.mat
 end
 
 for i=1:size(ind,1)
@@ -280,15 +307,15 @@ doDraw = 0;     %display area refinement result
 bgkSize = 5;    %size around the cell where the background is not quantified
 superSampling = 1; %increase the resolution of the image (must be an integer)
 
-NIteration = 40; % Number of iteration of the area refinement algorithm, increase when using temporal binning
-dilateSizeAfterRefine = 1; %if >=1 dilate a bit the area after the refinement
+NIteration = 8; % Number of iteration of the area refinement algorithm, increase when using temporal binning
+dilateSizeAfterRefine = 0; %if >=1 dilate a bit the area after the refinement
 
-s = 20; %size of the window around the cells
+s = 50; %size of the window around the cells
 
 mkdirIfNotExist('snapShots')
 
-
 a = imread(['zStackedYFP/' num2str(1) '.png']);
+
 N1=size(a,1);
 N2=size(a,2);
 
@@ -322,10 +349,45 @@ save touchBorder.mat touchBorder
 
 mkdirIfNotExist('snapShots')
 
-doDraw = 1;
+doDraw = 0;
+useFullSizeImages = 1;
 inputFolder = 'zStackedYFP/';
+threshFoler = 'zStackedThreshCorrectedRefined'; %'zStackedThreshCorrected';
   
+NToTrack = N;
+
+colorIndex = 2;
+s = 45;
+
 makeImagesForTraceTool
+
+%%
+    n=1;
+    idx = longTraces(n);
+    
+    i = round(trajX(idx,:));
+    j = round(trajY(idx,:));
+    
+    ifull = round(binsize*trajX(idx,:));
+    jfull = round(binsize*trajY(idx,:));
+    
+    for k=1:N
+
+            a = imread(['fullSizeimg/' getImageName(expe.colorNames{colorIndex},k)]);
+            %a = imread(['img/' getImageName(expe.colorNames{colorIndex},k)]);
+            
+            [seli selj] = getNeiInd(ifull(k),jfull(k),binsize*s,binsize*N1,binsize*N2);
+            a(selj,seli) = a(selj,seli)*0.5;
+            
+            clfh
+            imagesc(a)
+            plot(ifull(k),jfull(k),'ws')
+            %set(gca,'Ydir','normal')
+            
+            
+            drawnow
+            
+    end
 
 %% delete peakMatrixFinal and divMatrixFinal (reset guiTraces)
 
@@ -405,20 +467,37 @@ load divMatrixFinal.mat
 load peakMatrixFinal.mat
 
 clf
-imagesc(peakMatrix(:,:,1)-divMatrix)
+imagesc(peakMatrix(:,:,2)-0.1*divMatrix)
 
 %% make nice time plot with images
 
-idx = longTraces(4)
+idx = longTraces(2)
 
-signalToPlot = refinedSum(:,:,1); %which signal to plot
-colorIndex = 1; %which images to show
-showSeg = 1;
+signalToPlot = refinedMean(:,:,1); %which signal to plot
+colorIndex = 2; %which images to show
+showSeg = 0;
 
-s  = 8;    % size of window around the cell
+gaussianFilterSize = 250;
+doNormalize=1;
+
+s  = 45;    % size of window around the cell
 nR = 10;    % number of rows in the image
 
+NtoPlot = 120;
+
+
+useFullSizeImages = 1;
+doDraw = 1;
+
+
+
 makeImageTimePlot
+
+
+%% measure something
+
+
+
 
 
 

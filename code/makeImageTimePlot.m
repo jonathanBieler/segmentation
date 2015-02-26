@@ -1,46 +1,111 @@
 i = round(traj{idx}(:,1));
 j = round(traj{idx}(:,2));
 
+ifull = round(binsize*trajX(idx,:));
+jfull = round(binsize*trajY(idx,:));
+
 clf;
 
-[N1,N2] = getImageDimensions(expe);
-w=2*s+1;
 
-tot = N;
+if( gaussianFilterSize >  0)
+    H = fspecial('gaussian',500,gaussianFilterSize);
+end
+
+[N1,N2] = getImageDimensions(expe);
+
+
+w=2*s+1;
+ws = 2*s*binsize+1;
+
+if( useFullSizeImages)
+    w = 2*s*binsize+1;
+end
+
+tot = NtoPlot;
 
 d = round(tot/nR);
 
-out = zeros(d*w,nR*w);
-outseg = zeros(d*w,nR*w); 
+if( useFullSizeImages)
+    out = zeros(d*ws,nR*ws);
+    outseg = zeros(d*ws,nR*ws); 
+else
+
+    out = zeros(d*w,nR*w);
+    outseg = zeros(d*w,nR*w); 
+end
 
 dk = 1;
 
 sel = find(ind(idx,:)>0);
 
-for k=sel(1):1:sel(end)
+for k=sel(1):1: min(sel(end), sel(1)+NtoPlot-1)
 
+    disp(k/sel(end))
 
-    a   = imread( ['img/' getImageName(expe.colorNames{colorIndex},k)] );
+    if( useFullSizeImages )
+        a = imread(['fullSizeimg/' getImageName(expe.colorNames{colorIndex},k)]);
+    else
+        a = imread(['img/' getImageName(expe.colorNames{colorIndex},k)]);
+    end
+    
+    
     seg = imread( ['zStackedThreshCorrectedRefined/' n2s(k) '.png'] );
     
     [seli selj] = getNeiInd(i(k),j(k),s,N2,N1);
+    
+    if( useFullSizeImages)
+        [selif seljf] = getNeiInd(1+binsize*(i(k)-1),1+binsize*(j(k)-1),binsize*s,binsize*N1,binsize*N2);
+        sub_a = a(seljf,selif);
+    else
+        sub_a = a(selj,seli);
+    end
 
     %if(min(seli)>0 && min(selj>0) && max(seli) < N2 && max(selj) < N1 )
 
-    sub_a = a(selj,seli);
+    
     seg = seg(selj,seli);
+    
+    if( useFullSizeImages )
+        seg = imresize(seg, size(sub_a));
+    end
+    
+    
     seg = bwmorph(seg,'remove');
     
 
-    ind_out_i = (w*mod(dk-1,d)+1):(w*mod(dk-1,d)+w);
-    ind_out_j = (w*(ceil(dk/d)-1) +1):(w*(ceil(dk/d)-1) +w);
+    if( useFullSizeImages )
+        
+               
+        ind_out_i = (ws*mod(dk-1,d)+1):(ws*mod(dk-1,d)+ws);
+        ind_out_j = (ws*(ceil(dk/d)-1) +1):(ws*(ceil(dk/d)-1) +ws);
+        
+    else
+        
+        ind_out_i = (w*mod(dk-1,d)+1):(w*mod(dk-1,d)+w);
+        ind_out_j = (w*(ceil(dk/d)-1) +1):(w*(ceil(dk/d)-1) +w);
+    
+    end
 
+    if( gaussianFilterSize >  0)
+        sub_a = double(sub_a);
+        sub_a = sub_a - imfilter(sub_a,H,'replicate'); 
+    end
+    
+    if(doNormalize)
+        sub_a = qnorm(sub_a,0.01);
+    end
 
     out(ind_out_i,ind_out_j,1) =  sub_a;
     outseg(ind_out_i,ind_out_j,1) =  seg;
 
 
     dk = dk+1;
+    
+    if(doDraw)
+        clf
+        imagesc(out)
+        drawnow
+    end
 
 end
 
@@ -49,7 +114,7 @@ p = 0.001;
 out = out';
 outseg = outseg';
 
-out(out==0) = mean(out(out>0));
+out(out==0) = min(out(out>0));
 
 if(showSeg)
     out_ = repmat(out,[1,1,3]);
@@ -58,6 +123,8 @@ if(showSeg)
     out_(:,:,1) = tmp;
     q = quantile(out_(:),1-p);
     out_(out_ > q) = q;
+else
+    out_ = out;
 end
 
 out = imnorm(out_);
