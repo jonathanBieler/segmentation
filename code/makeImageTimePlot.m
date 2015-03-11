@@ -1,8 +1,9 @@
+mstd = [];
+mmean = [];
+
 i = round(traj{idx}(:,1));
 j = round(traj{idx}(:,2));
 
-ifull = round(binsize*trajX(idx,:));
-jfull = round(binsize*trajY(idx,:));
 
 clf;
 

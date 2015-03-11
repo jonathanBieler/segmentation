@@ -1,10 +1,10 @@
 %% experiment paramaters
 
-%movie 1: d3 : goodTrace: 2
-%movie 2: d5
-%movie 3: b3 : goodTrace: 2,4
-%movie 4: C6
-%movie 5: B4 : goodTrace: 5
+% movie 1: d3 : goodTrace: 2
+% movie 2: d5
+% movie 3: b3 : goodTrace: 2,4
+% movie 4: C6
+% movie 5: B4 : goodTrace: 5
 
 cd /Users/bieler/Desktop/matlab/histoneStuff/2015_19_02_Rosie_Venus_H2B_Z_stacks_1
 
@@ -16,7 +16,7 @@ N = expe.numberOfFrames;
 
 % Define some stuff, move into the right folder
 
-movie = 5;
+movie = 1;
 
 binsize = 4;
 
@@ -506,10 +506,9 @@ start = 30;
 useFullSizeImages = 1;
 doDraw = 1;
 
-mstd = [];
-mmean = [];
 
 makeImageTimePlot
+
 
 %% plot circadian phase
 
