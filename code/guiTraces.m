@@ -105,6 +105,8 @@ function guiTraces_OpeningFcn(hObject, eventdata, handles, varargin)
     load refinedArea.mat refinedArea
     load traj.mat traj
     load ind.mat ind
+    load signal.mat
+    load areaMatrix.mat
     
     signal = refinedMean;
     areaMatrix = refinedArea;

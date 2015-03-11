@@ -38,7 +38,7 @@ dk = 1;
 
 sel = find(ind(idx,:)>0);
 
-for k=sel(1):1: min(sel(end), sel(1)+NtoPlot-1)
+for k=start:1: min(sel(end), start+NtoPlot-1)
 
     disp(k/sel(end))
 
@@ -91,6 +91,9 @@ for k=sel(1):1: min(sel(end), sel(1)+NtoPlot-1)
         sub_a = sub_a - imfilter(sub_a,H,'replicate'); 
     end
     
+    mstd  = [mstd; std(sub_a(:))];
+    mmean = [mmean; mean(sub_a(:))];
+    
     if(doNormalize)
         sub_a = qnorm(sub_a,0.01);
     end
@@ -129,12 +132,14 @@ end
 
 out = imnorm(out_);
 
-%panel A
+%% panel A
+
+clf
 subplot(3,1,[1 2])
 
 imagesc(out)
 
-%%
+%
 set(gca,'XTick',[])
 set(gca,'YTick',[w/2:w:nR*w])
 
@@ -143,43 +148,62 @@ ts = ts(1:length([w/2:w:nR*w]));
 set(gca,'YTickLabel', round(ts*4)/4 )
 
 title(expe.colorNames{colorIndex})
-%%
 
 caxis([ quantile(out(:),p) quantile(out(:),1-p) ])
+
+%caxis([ 0 1 ])
+
+%%
+
 
 hold on
 
 dk = 1;
-for k=sel(1):1:sel(end)
+for k=start:1: min(sel(end), start+NtoPlot-1)
     
-    ind_out_i = (w*mod(dk-1,d)+1):(w*mod(dk-1,d)+w);
-    ind_out_j = (w*(ceil(dk/d)-1) +1):(w*(ceil(dk/d)-1) +w);
         
     if(divMatrix(idx,k)==1)
-       plot(ind_out_i(1)+6, ind_out_j(1)+6,'*r','lineWidth',1)
+        
+       ind_out_i = (w*mod(dk-1,d)+1):(w*mod(dk-1,d)+w);
+       ind_out_j = (w*(ceil(dk/d)-1) +1):(w*(ceil(dk/d)-1) +w);
+        
+       plot(ind_out_i(1)+40, ind_out_j(1)+40,'*r','lineWidth',1)
     end
 
+    if(peakMatrix(idx,k,colorIndex)==1)
+        
+       ind_out_i = (w*mod(dk-1,d)+1):(w*mod(dk-1,d)+w);
+       ind_out_j = (w*(ceil(dk/d)-1) +1):(w*(ceil(dk/d)-1) +w);
+        
+       plot(ind_out_i(1)+40, ind_out_j(1)+40,'*r','lineWidth',1)
+    end
+    
     dk = dk+1;
 end
 
-%panel B
+%% panel B
 
 subplot(3,1,3)
 
 hold on
+sel = find(ind(idx,:)>0);
 
 t = linspace(0,length(sel)*expe.dt,length(sel));
-s =  signalToPlot(idx,sel);
+s =  imnorm(signalToPlot(idx,sel));
 
 divs = find(divMatrix(idx,sel));
-peaks = find(peakMatrix(idx,sel));
+peaks = find(peakMatrix(idx,sel,colorIndex));
 
 for j=1:length(divs)
    plot([t(divs(j)) t(divs(j))],[min(s)-0.04 0.6*max(s(:))],'color','r') 
 end
 
+for j=1:length(peaks)
+   plot([t(peaks(j)) t(peaks(j))],[min(s)-0.04 0.6*max(s(:))],'color','r') 
+end
+
 plot(t,s,'k')
 axis([min(t) max(t) min(s) max(s)*1.1])
-xlabel('time')
+xlabel('time [h]')
 
 colormap gray

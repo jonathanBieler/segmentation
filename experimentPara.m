@@ -6,7 +6,7 @@ expe=struct();
 
 %% change this
 
-expe.numberOfFrames = 658;
+expe.numberOfFrames = 600;
 expe.dt = 1/12;
 
 expe.numberOfMovies = 1;
@@ -18,7 +18,7 @@ expe.colorNames = {'YFP','TexasRed'};
 expe.hasTrans = 0;
 expe.transName = 'Trans';
 
-expe.imgDir = '/Volumes/Backup/2015_19_02_Rosie_Venus_H2B_Z_stacks_1/d3/';
+expe.imgDir = '/Volumes/Backup/2015_19_02_Rosie_Venus_H2B_Z_stacks_1/b4/';
 
 expe.mainDir = '/Users/bieler/Desktop/matlab/histoneStuff/2015_19_02_Rosie_Venus_H2B_Z_stacks_1';
 

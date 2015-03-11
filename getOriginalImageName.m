@@ -12,4 +12,4 @@ function fname = getOriginalImageName(expe,colorName,movie,frame)
 
     t = expe.dt*60*60*1000*(frame-1);
 
-    fname = [expe.imgDir '/' 'D - 3(fld 1 wv ' colorName ' - ' colorName '- time ' n2s(frame) ' - ' n2s(t) ' ms).tif'];
+    fname = [expe.imgDir '/B - 4(fld 1 wv ' colorName ' - ' colorName '- time ' n2s(frame) ' - ' n2s(t) ' ms).tif'];

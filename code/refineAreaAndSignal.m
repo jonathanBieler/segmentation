@@ -22,6 +22,7 @@ for n=1:length(longTraces)
     
     for k=1:N
         
+        disp(k);
         
         %%
         if( ~exist(['zStackedThreshCorrectedRefined/' num2str(k) '.png'],'file') )

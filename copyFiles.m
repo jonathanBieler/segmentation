@@ -121,8 +121,9 @@ end
 
 
 doDraw = 1 ;
+i=5;
 
-for i = expe.indexOfFirstMovie:(expe.indexOfFirstMovie + expe.numberOfMovies  -1)
+%for i = expe.indexOfFirstMovie:(expe.indexOfFirstMovie + expe.numberOfMovies  -1)
     
     mkdirIfNotExist([expe.mainDir '/movie' num2str(i)]);
     mkdirIfNotExist([expe.mainDir '/movie' num2str(i) '/img/']);
@@ -159,7 +160,7 @@ for i = expe.indexOfFirstMovie:(expe.indexOfFirstMovie + expe.numberOfMovies  -1
         end
                     
     end
-end
+%end
    
 %%
 

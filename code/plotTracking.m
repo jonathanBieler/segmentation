@@ -10,6 +10,7 @@ col(:,1) = 0.4*col(:,1);
 col(:,2) = 0.4*col(:,2);
 col(:,3) = col(:,3).^0.1;
 
+
 for k=1:1:NToTrack
     
     k
@@ -31,16 +32,22 @@ for k=1:1:NToTrack
     
     idx = find(ind(:,k));
     
+    
     for i=1:length(idx)
         
+               
         j = idx(i);
         
-        plot(trajX(j,k)+0*randn,trajY(j,k),'s','color',col(i,:),'markerSize',10)       
- 
-        if(k>1 && trajX(j,k-1)>0 && trajY(j,k-1)>0)
-                        
-            plot([trajX(j,k-1) trajX(j,k)],[trajY(j,k-1) trajY(j,k)],'color',col(i,:))        
-        end        
+        if( ~longTracesOnly || ismember(j,longTraces) )
+        
+            plot(trajX(j,k)+0*randn,trajY(j,k),'s','color',col(i,:),'markerSize',10)       
+
+            if(k>1 && trajX(j,k-1)>0 && trajY(j,k-1)>0)
+
+                plot([trajX(j,k-1) trajX(j,k)],[trajY(j,k-1) trajY(j,k)],'color',col(i,:))        
+            end        
+
+        end
     end
     
     set(gca,'Ydir','normal')
