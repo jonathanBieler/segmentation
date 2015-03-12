@@ -151,6 +151,7 @@ set(gca,'YTickLabel', round(ts*4)/4 )
 
 title(expe.colorNames{colorIndex})
 
+ylabel('time [h]')
 caxis([ quantile(out(:),p) quantile(out(:),1-p) ])
 
 %caxis([ 0 1 ])

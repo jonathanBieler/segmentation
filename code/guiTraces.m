@@ -129,23 +129,19 @@ function guiTraces_OpeningFcn(hObject, eventdata, handles, varargin)
     Ntraces = length(longTraces);  
     
     %set the color scale
-    if(exist('guiTracesCaxis.mat','file'))
-       load('guiTracesCaxis.mat')
-       set(handles.caxisMin,'String',num2str(caxisMin));
-       set(handles.caxisMax,'String',num2str(caxisMax));
-    else
+
         
-        if(exist(['snapShots/' num2str(longTraces(1)) '_' num2str(1) '.png'],'file'))
-            im = imread(['snapShots/' num2str(longTraces(1)) '_' num2str(1) '.png']);
-            
-            caxisMin = min(im(:));
-            caxisMax = max(im(:));
-        end
-        
-        set(handles.caxisMin,'String',num2str(caxisMin));
-        set(handles.caxisMax,'String',num2str(caxisMax));
-        save guiTracesCaxis.mat caxisMin caxisMax
+    if(exist(['snapShots/' num2str(longTraces(1)) '_' num2str(1) '.png'],'file'))
+        im = imread(['snapShots/' num2str(longTraces(1)) '_' num2str(1) '.png']);
+
+        caxisMin = min(im(:));
+        caxisMax = max(im(:));
     end
+
+    set(handles.caxisMin,'String',num2str(caxisMin));
+    set(handles.caxisMax,'String',num2str(caxisMax));
+      
+    
     
     global gif gmap;    
     %[gif gmap] = imread([moviePath 'snapShots/' num2str(longTraces(k)) '.gif'],'frames','all');

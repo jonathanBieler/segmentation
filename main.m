@@ -10,7 +10,7 @@ N = expe.numberOfFrames;
 
 % Define some stuff, move into the right folder
 
-movie = 10;
+movie = 51;
 
 binsize = 2;
 
@@ -23,7 +23,7 @@ addpath ../code/regionbased_seg
 set(0,'defaultlinelinewidth',2)
 
 
-%% reload everythin if needed
+%% reload everything if needed (after closing matlab)
 
 f = dir('*.mat');
 for i=1:length(f)
@@ -55,7 +55,7 @@ doImageBinning;
 Nz = expe.numberOfColors; %number of images to combine
 
 deNoise = {'none','BM3D','median','localNorm'}; %denoise algo on each stack
-deNoise = deNoise{1};
+deNoise = deNoise{3};
 
 medianSize = 3;
 
@@ -262,7 +262,7 @@ indAnnotation = zeros(size(ind));
 if( exist('lengthThresh.mat','file') )
     load lengthThresh.mat;
 else
-    lengthThresh = 0.6; %note: to change lengthThresh value you first need to delete the file if it exists: !rm lengthThresh.mat
+    lengthThresh = 0.9; %note: to change lengthThresh value you first need to delete the file if it exists: !rm lengthThresh.mat
 end
 
 for i=1:size(ind,1)
@@ -307,10 +307,10 @@ doDraw = 1;     %display area refinement result
 bgkSize = 10;    %size around the cell where the background is not quantified
 superSampling = 1; %increase the resolution of the image (must be an integer)
 
-NIteration = 14; % Number of iteration of the area refinement algorithm, increase when using temporal binning
+NIteration = 10; % Number of iteration of the area refinement algorithm, increase when using temporal binning
 dilateSizeAfterRefine = 1; %if >=1 dilate a bit the area after the refinement
 
-s = 20; %size of the window around the cells
+s = 50; %size of the window around the cells
 
 mkdirIfNotExist('snapShots')
 
@@ -330,15 +330,6 @@ bkg  = zeros([size(areaMatrix) size(signal,3)]);
 
 refineAreaAndSignal
 
-save refinedMean.mat refinedMean
-save refinedSum.mat refinedSum
-save refinedStd.mat refinedStd
-save bkg.mat bkg
-save refinedArea.mat refinedArea
-save touchBorder.mat touchBorder
-
-
-
 %% make small images around each cell for the trace tool 
 % use if you don't want to do the refine area thing above
 
@@ -347,12 +338,15 @@ mkdirIfNotExist('snapShots')
 doDraw = 1;
 useFullSizeImages = 1;
 inputFolder = 'zStackedYFP/';
-threshFoler = 'zStackedThreshCorrectedRefined'; %zStackedThreshCorrected
+threshFoler = {'zStackedThreshCorrected','zStackedThreshCorrectedRefined'};
+threshFoler = threshFoler{2};
   
 NToTrack = N;
 
-colorIndex = 1;
-s = 15;
+colorIndex = 2;
+s = 45;
+
+traces = 1:length(longTraces);
 
 makeImagesForTraceTool
 
@@ -381,7 +375,7 @@ end
 
 xlabel('time [h]')
 
-%% plot mean signal, trace i 
+%% plot mean signal, trace i, and export
 
 i=1
 colorIndex = 1;
@@ -447,7 +441,8 @@ imagesc(peakMatrix(:,:,2)-0.1*divMatrix)
 
 %% make nice time plot with images
 
-idx = longTraces(1)
+i=3;
+idx = longTraces(i);
 
 signalToPlot = refinedSum(:,:,1)-bkg(:,:,1).*refinedArea(:,:,1); %which signal to plot
 colorIndex = 1; %which images to show
@@ -456,10 +451,10 @@ showSeg = 1;
 gaussianFilterSize = 0; %set to zero to disable
 doNormalize=1;
 
-s  = 6;    % size of window around the cell
+s  = 40;    % size of window around the cell
 nR = 3;    % number of rows in the image
 
-NtoPlot = 50;
+NtoPlot = 15;
 start = 1;
 
 useFullSizeImages = 1;
@@ -467,7 +462,8 @@ doDraw = 1;
 
 makeImageTimePlot
 
-
-
+fname =['figures/cell' n2s(longTraces(i)) '.png'];
+write_image(fname,0.6);
+system(['open ' fname])
 
 

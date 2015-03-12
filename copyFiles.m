@@ -13,7 +13,7 @@ switch naming
     
     case 'biop'
 
-%% stacked tif
+%% copy stacked tif
 
 for i = expe.indexOfFirstMovie:(expe.indexOfFirstMovie + expe.numberOfMovies  -1)
    
@@ -80,10 +80,6 @@ for i = expe.indexOfFirstMovie:(expe.indexOfFirstMovie + expe.numberOfMovies  -1
             imwrite(A,name)
 
         end
-        
-        
-        system(['mv ' expe.mainDir '/movie' num2str(i) '/img/*.tif ~/.Trash' ]);
-        system(['mv ' expe.mainDir '/movie' num2str(i) '/img/*.TIF ~/.Trash' ]);
     
     end
     
@@ -125,8 +121,14 @@ for i = expe.indexOfFirstMovie:(expe.indexOfFirstMovie + expe.numberOfMovies  -1
         %system(['rm "' fname '"']);
 
     end
+    
+            
+    system(['mv ' expe.mainDir '/movie' num2str(i) '/img/*.tif ~/.Trash' ]);
+    system(['mv ' expe.mainDir '/movie' num2str(i) '/img/*.TIF ~/.Trash' ]);
 
 end
+
+disp('done');
 
 case 'bsf'
    

@@ -60,6 +60,7 @@ imagesc(trajX_)
 idxBin = 1:No/temporalBinning;
 k = reshape(repmat(idxBin,temporalBinning,1),1,[]);
 
+k = [k ones(No-length(k),1)*k(end)]; %when temporalBinning doesn't divide No nicely
 
 for i = 1:No
     

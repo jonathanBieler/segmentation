@@ -1,6 +1,11 @@
 mkdirIfNotExist('zStackedThreshCorrectedRefined')
  
+refinedTrajX = trajX;
+refinedTrajY = trajY;
 
+if( exist(['zStackedThreshCorrectedRefined/' num2str(k) '.png'],'file') )
+   system('rm  zStackedThreshCorrectedRefined/*.png');
+end
 
 for n=1:length(longTraces)
         
@@ -17,6 +22,7 @@ for n=1:length(longTraces)
     d = round(tot/nR);
     out = zeros(d*w,nR*w);
     
+        
     %i = round(traj{idx}(:,1));
     %j = round(traj{idx}(:,2));
     
@@ -61,6 +67,8 @@ for n=1:length(longTraces)
                 
             seli = seli(valid);
             selj = selj(valid);
+            
+            [Y X] = meshgrid(selj-min(selj),seli-min(seli));
 
             sub_a = a(selj,seli);
             
@@ -132,9 +140,14 @@ for n=1:length(longTraces)
                 seg = imdilate(seg,strel('disk',dilateSizeAfterRefine));
             end
             
+            
             mrefined(selj,seli) = mrefined(selj,seli)  +  imresize(seg,1./superSampling);
             imwrite(mrefined,['zStackedThreshCorrectedRefined/' num2str(k) '.png']);
-
+            
+            %update traj
+            
+            refinedTrajX(idx,k) = min(seli(:)) + mean(X(seg));
+            refinedTrajY(idx,k) = min(selj(:)) + mean(Y(seg));
             %
             tmp = imclearborder(seg);
 
@@ -195,3 +208,12 @@ for n=1:length(longTraces)
     drawnow
     
 end
+
+
+
+save refinedMean.mat refinedMean
+save refinedSum.mat refinedSum
+save refinedStd.mat refinedStd
+save bkg.mat bkg
+save refinedArea.mat refinedArea
+save touchBorder.mat touchBorder

@@ -184,6 +184,7 @@ function a = getImage(k,handles)
     
     if( expe.hasTrans && get(handles.transCheckBox,'value')  )
         a = abs( imread([moviePath 'img/' getImageName(expe.transName,k)]) );
+        a = repmat(a,[1 1 3]);
     else
         a = imread([moviePath 'zStackedYFP/' num2str(k) '.png']);
     end
@@ -306,6 +307,7 @@ switch EventData.Character
         
         set(handles.transCheckBox,'value', ~get(handles.transCheckBox,'value') );
         
+        
         C = get(handles.axesSeg, 'CurrentPoint');
         i = ceil(C(1,1));
         j = ceil(C(1,2));
@@ -344,7 +346,7 @@ switch EventData.Character
        i = max(i,1); j = max(j,1);             
        i = min(i,512); j = min(j,512);
        
-       [seli selj] = getNeiInd(j,i,31,N1,N2);
+       [seli selj] = getNeiInd(j,i,round(N1/8) ,N1,N2);
        
        sub_seg = imnorm( seg(seli,selj) );
               
@@ -413,7 +415,7 @@ switch EventData.Character
        i = max(i,1); j = max(j,1);             
        i = min(i,N2); j = min(j,N1);
        
-       [seli selj] = getNeiInd(j,i,60,N2,N1);
+       [seli selj] = getNeiInd(j,i,round(N1/8),N2,N1);
               
        sub_seg = imnorm( a(seli,selj) );                   
        th = quantile(sub_seg(:),str2double( get(handles.edit3,'String')) );       
@@ -454,7 +456,7 @@ switch EventData.Character
            i = max(i,1); j = max(j,1);             
            i = min(i,N2); j = min(j,N1);
        
-           [seli selj] = getNeiInd(j,i,20,N1,N2);
+           [seli selj] = getNeiInd(j,i,round(N1/8),N1,N2);
 
            sub_seg = imnorm( a(seli,selj) );                   
            th = quantile(sub_seg(:),str2double( get(handles.edit3,'String')) );       
@@ -542,7 +544,7 @@ switch EventData.Character
        i = max(i,1); j = max(j,1);             
        i = min(i,N2); j = min(j,N1);
        
-       [seli selj] = getNeiInd(j,i,20,N2,N1);
+       [seli selj] = getNeiInd(j,i,round(N1/8),N2,N1);
               
        sub = ( seg(seli,selj) );
        
@@ -570,7 +572,7 @@ switch EventData.Character
        i = max(i,1); j = max(j,1);             
        i = min(i,N2); j = min(j,N1);
        
-       [seli selj] = getNeiInd(j,i,20,N2,N1);
+       [seli selj] = getNeiInd(j,i,round(N1/8),N2,N1);
               
        seg(seli,selj) = 0;
        

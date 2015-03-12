@@ -163,7 +163,7 @@ for t=1:N
     end
 end
 
-imagesc(peakMatrix)
+imagesc(areaMatrix)
 colormap jet
 
 save areaMatrix.mat areaMatrix
