@@ -7,7 +7,6 @@ naming = {'biop','bsf'};
 naming = naming{1};
 
 
-
 %%
 
 switch naming

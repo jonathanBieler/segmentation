@@ -50,7 +50,7 @@ switch method
         tmp(idx) = mean(tmp(~idx)) + randn(1,sum(idx));
     end
 
-    HG = fspecial('gaussian',100,5);
+    HG = fspecial('gaussian',100,  ceil(10*1/expe.dt) );
     f = imfilter(tmp,HG,'replicate');
     
     if doDraw 
@@ -91,7 +91,7 @@ case 'fastDiff'
 
     %HG = fspecial('gaussian',100,5);
     %f = imfilter(tmp,HG,'replicate');
-    f=smooth(tmp,10)';
+    f = smooth(tmp,10)';
     
     if doDraw 
        

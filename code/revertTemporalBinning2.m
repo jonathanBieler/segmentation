@@ -112,4 +112,30 @@ for i = 1:No
   
 end
 
+%% replace stacked images
+
+system('rm zStackedYFP/*.png')
+system('cp zStackedYFP_unbinned/*.png zStackedYFP/')
+
+%% redo the measures with corrected images
+
+N = No;
+
+threshFolder = 'zStackedThreshCorrected/';
+nObj = doMeasures(N,threshFolder,expe);
+
+
+%% load all measures & do the final Tracking
+
+NToTrack = N;
+
+doLinksOnly = 0;
+
+clc
+Me = loadMeasures(N);
+[tracks, signal, traj, ind, divisions,divPerframe,trajX,trajY] = doTracking(NToTrack, Me,doLinksOnly);
+
+
+
+
 end

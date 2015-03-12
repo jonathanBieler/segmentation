@@ -1,5 +1,5 @@
 mstd = [];
-mmean = [];
+msum = [];
 
 i = round(traj{idx}(:,1));
 j = round(traj{idx}(:,2));
@@ -86,14 +86,15 @@ for k=start:1: min(sel(end), start+NtoPlot-1)
         ind_out_j = (w*(ceil(dk/d)-1) +1):(w*(ceil(dk/d)-1) +w);
     
     end
+    
+    sub_a = double(sub_a);
 
-    if( gaussianFilterSize >  0)
-        sub_a = double(sub_a);
+    if( gaussianFilterSize >  0)        
         sub_a = sub_a - imfilter(sub_a,H,'replicate'); 
     end
     
-    mstd  = [mstd; std(sub_a(:))];
-    mmean = [mmean; mean(sub_a(:))];
+    mstd  = [mstd; std((sub_a(:)))];
+    msum =  [msum; sum((sub_a(:)))];
     
     if(doNormalize)
         sub_a = qnorm(sub_a,0.01);

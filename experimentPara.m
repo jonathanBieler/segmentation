@@ -6,7 +6,7 @@ expe=struct();
 
 %% change this
 
-expe.numberOfFrames = 30;
+expe.numberOfFrames = 50;
 expe.dt = 1/2;
 
 expe.numberOfMovies = 1;

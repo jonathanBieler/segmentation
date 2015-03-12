@@ -100,7 +100,8 @@ for n=1:length(longTraces)
             
             %check if object touch the border of the frame
             updateArea = 1;
-            if( (sum(m(:,1)) + sum(m(:,end)) + sum(m(1,:)) + sum(m(end,:)))>0 )
+            mBord = imdilate(m,strel('disk',1));
+            if( (sum(mBord(:,1)) + sum(mBord(:,end)) + sum(mBord(1,:)) + sum(mBord(end,:)))>0 )
            
                 touchBorder(idx,k) = 1;                
                 updateArea = 0;

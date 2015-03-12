@@ -69,7 +69,7 @@ function mystruct = get_struct(type, nstruct)
     % Structure containing the different parameters required for tracking spots
     case 'spot_tracking'
       mystruct = struct('fusion_thresh', 2, ...         % Minimal distance in um to another spot (estimation) before fusion
-                        'frame_displacement', 60, ...   % Maximal displacement of a spot (in random units) between two frames 
+                        'frame_displacement', 50, ...   % Maximal displacement of a spot (in random units) between two frames 
                         'split_cost',1,...              % Cost of splits: low cost -> more divisions
                         'frame_window', 2, ...          % Considered number of frames for the gap closing algorithm (see track_spots.m)
                         'gap_function', @relative_distance, ... % Function used to measure the gap-closing weight

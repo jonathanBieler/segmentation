@@ -10,7 +10,7 @@ N = expe.numberOfFrames;
 
 % Define some stuff, move into the right folder
 
-movie = 2;
+movie = 10;
 
 binsize = 2;
 
@@ -60,7 +60,7 @@ deNoise = deNoise{1};
 medianSize = 3;
 
 weightsSegmentation = [1 1 1]; %weights for summing the different channels
-compressionQuantile = 0.999;       %signal above this quantile will be cut off, set to 1 to disable
+compressionQuantile = 0.999;   %signal above this quantile will be cut off, set to 1 to disable
 gaussianFilterSize = 20;       %typycal length of the background
 
 temporalBinning = 2;
@@ -310,7 +310,7 @@ superSampling = 1; %increase the resolution of the image (must be an integer)
 NIteration = 14; % Number of iteration of the area refinement algorithm, increase when using temporal binning
 dilateSizeAfterRefine = 1; %if >=1 dilate a bit the area after the refinement
 
-s = 40; %size of the window around the cells
+s = 20; %size of the window around the cells
 
 mkdirIfNotExist('snapShots')
 
@@ -337,12 +337,6 @@ save bkg.mat bkg
 save refinedArea.mat refinedArea
 save touchBorder.mat touchBorder
 
-%%
-
-% refinedMean = signal;
-% save refinedMean.mat refinedMean
-% refinedArea = areaMatrix;
-% save refinedArea.mat refinedArea
 
 
 %% make small images around each cell for the trace tool 
@@ -358,7 +352,7 @@ threshFoler = 'zStackedThreshCorrectedRefined'; %zStackedThreshCorrected
 NToTrack = N;
 
 colorIndex = 1;
-s = 25;
+s = 15;
 
 makeImagesForTraceTool
 
@@ -453,19 +447,19 @@ imagesc(peakMatrix(:,:,2)-0.1*divMatrix)
 
 %% make nice time plot with images
 
-idx = longTraces(5)
+idx = longTraces(1)
 
-signalToPlot = refinedSum(:,:,1); %which signal to plot
+signalToPlot = refinedSum(:,:,1)-bkg(:,:,1).*refinedArea(:,:,1); %which signal to plot
 colorIndex = 1; %which images to show
-showSeg = 0;
+showSeg = 1;
 
-gaussianFilterSize = 90; %set to zero to disable
+gaussianFilterSize = 0; %set to zero to disable
 doNormalize=1;
 
-s  = 8;    % size of window around the cell
+s  = 6;    % size of window around the cell
 nR = 3;    % number of rows in the image
 
-NtoPlot = 30;
+NtoPlot = 50;
 start = 1;
 
 useFullSizeImages = 1;
