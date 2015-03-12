@@ -82,35 +82,30 @@ function guiTraces_OpeningFcn(hObject, eventdata, handles, varargin)
     axesData = handles.axes1;
     axesGif = handles.axes2;
 
-    global areaMatrix tracks  signal traj ind longTraces peakMatrix divMatrix divisions modK speed;
+    global areaMatrix tracks  signal traj ind longTraces peakMatrix divMatrix divisions modK speed expe;
     global caxisMin caxisMax;
-    
-    if(exist('guiTracesCaxis.mat','file'))
-       load('guiTracesCaxis.mat')
-       set(handles.caxisMin,'String',num2str(caxisMin));
-       set(handles.caxisMax,'String',num2str(caxisMax));
-    else
-        caxisMin = str2double(get(handles.caxisMin,'String'));
-        caxisMax = str2double(get(handles.caxisMax,'String'));
-        save guiTracesCaxis.mat caxisMin caxisMax
-    end
-    
+        
+    expe = experimentPara();
     
     modK=0;
     speed = 1;
       
     % load stuff
     load tracks.mat tracks
-    load refinedMean.mat refinedMean
-    load refinedArea.mat refinedArea
     load traj.mat traj
     load ind.mat ind
     load signal.mat
     load areaMatrix.mat
     
-    signal = refinedMean;
-    areaMatrix = refinedArea;
-    
+    if(exist('refinedMean.mat','file'))
+        load refinedMean.mat refinedMean
+        signal = refinedMean;
+    end
+    if(exist('refinedArea.mat','file'))
+        load refinedArea.mat refinedArea
+        areaMatrix = refinedArea;
+    end
+
     Nframes = size(signal,2);
     
     load divisions.mat divisions
@@ -131,7 +126,26 @@ function guiTraces_OpeningFcn(hObject, eventdata, handles, varargin)
        load divMatrix.mat
     end
 
-    Ntraces = length(longTraces);     
+    Ntraces = length(longTraces);  
+    
+    %set the color scale
+    if(exist('guiTracesCaxis.mat','file'))
+       load('guiTracesCaxis.mat')
+       set(handles.caxisMin,'String',num2str(caxisMin));
+       set(handles.caxisMax,'String',num2str(caxisMax));
+    else
+        
+        if(exist(['snapShots/' num2str(longTraces(1)) '_' num2str(1) '.png'],'file'))
+            im = imread(['snapShots/' num2str(longTraces(1)) '_' num2str(1) '.png']);
+            
+            caxisMin = min(im(:));
+            caxisMax = max(im(:));
+        end
+        
+        set(handles.caxisMin,'String',num2str(caxisMin));
+        set(handles.caxisMax,'String',num2str(caxisMax));
+        save guiTracesCaxis.mat caxisMin caxisMax
+    end
     
     global gif gmap;    
     %[gif gmap] = imread([moviePath 'snapShots/' num2str(longTraces(k)) '.gif'],'frames','all');
@@ -164,7 +178,9 @@ function  updatePlotGif()
 function KeyPress(Source, EventData)
     
     handles = guidata(gcf);
-    global t speed gmap axesData moviePath k tracks signal traj ind longTraces peakMatrix divMatrix Nframes divisions Ntraces gif;
+    global t speed gmap axesData moviePath k tracks signal traj ind longTraces peakMatrix divMatrix Nframes divisions Ntraces gif expe;
+
+    dt=expe.dt;
     
     signalIndex = min( get(handles.popupmenu1,'value'), size(signal,3) );
     
@@ -249,7 +265,7 @@ function KeyPress(Source, EventData)
             mouseX = C(1,1);
             mouseY = C(1,2);
         
-            frame = round( Nframes*mouseX/(Nframes*0.5) );
+            frame = ceil( Nframes*mouseX/(Nframes*dt) );
             frame = min(frame, Nframes);
             frame = max(frame, 1);
             
@@ -293,7 +309,9 @@ function KeyPress(Source, EventData)
     
 function mouseMove(hObject,eventdata)
    
-    global axesData t Nframes modK;
+    global axesData t Nframes modK expe;
+    
+    dt = expe.dt;
     
     modK = modK+1;
     
@@ -308,7 +326,7 @@ function mouseMove(hObject,eventdata)
         mouseX = C(1,1);
         mouseY = C(1,2);
 
-        frame = round( Nframes*mouseX/(Nframes*0.5) );
+        frame = ceil( Nframes*mouseX/(Nframes*dt) );
         frame = min(frame, Nframes);
         frame = max(frame, 1);
 
@@ -351,12 +369,11 @@ function updatePlot(handles)
 
 
         
-    global signal areaMatrix t Ntraces longTraces k axesData peakMatrix divMatrix ind divisions Nframes;     
+    global signal areaMatrix t Ntraces longTraces k axesData peakMatrix divMatrix ind divisions Nframes expe;     
     
     signalIndex = min( get(handles.popupmenu1,'value'), size(signal,3) );
 
-    expe.t = linspace(0,0.5*Nframes,Nframes);
-    
+        
     axes(axesData);
     cla;
     hold on;

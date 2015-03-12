@@ -3,6 +3,16 @@ expe = experimentPara();
 cd(expe.mainDir)
 addpath code/
 
+naming = {'biop','bsf'};
+naming = naming{1};
+
+
+
+%%
+
+switch naming
+    
+    case 'biop'
 
 %% stacked tif
 
@@ -15,7 +25,7 @@ for i = expe.indexOfFirstMovie:(expe.indexOfFirstMovie + expe.numberOfMovies  -1
         
         colorName = expe.colorNames{j};
         
-        fname = getOriginalImageName(expe,colorName,i);
+        fname = getOriginalImageName(expe,colorName,i,1,naming);
     
         fname = ['''' fname ''''];            
         system(['cp -v ' fname ' ' expe.mainDir '/movie' num2str(i) '/img/']);
@@ -26,7 +36,7 @@ for i = expe.indexOfFirstMovie:(expe.indexOfFirstMovie + expe.numberOfMovies  -1
     
         colorName = expe.transName;
         
-        fname = getOriginalImageName(expe,colorName,i);
+        fname = getOriginalImageName(expe,colorName,i,1,naming);
     
         fname = ['''' fname ''''];            
         system(['cp -v ' fname ' ' expe.mainDir '/movie' num2str(i) '/img/']);
@@ -47,11 +57,11 @@ for i = expe.indexOfFirstMovie:(expe.indexOfFirstMovie + expe.numberOfMovies  -1
         
         colorName = expe.colorNames{j};
     
-        fname = getOriginalImageName(expe,colorName,i);
+        fname = getOriginalImageName(expe,colorName,i,1,naming);
 
         info = imfinfo(fname);
         num_images = numel(info);
-        for k = 1:num_images
+        for k = 1:expe.numberOfFrames
 
             zNumber = j;
             fNumber = k;
@@ -72,7 +82,9 @@ for i = expe.indexOfFirstMovie:(expe.indexOfFirstMovie + expe.numberOfMovies  -1
 
         end
         
-        system(['rm "' fname '"']);
+        
+        system(['mv ' expe.mainDir '/movie' num2str(i) '/img/*.tif ~/.Trash' ]);
+        system(['mv ' expe.mainDir '/movie' num2str(i) '/img/*.TIF ~/.Trash' ]);
     
     end
     
@@ -90,7 +102,7 @@ for i = expe.indexOfFirstMovie:(expe.indexOfFirstMovie + expe.numberOfMovies  -1
 
         info = imfinfo(fname);
         num_images = numel(info);
-        for k = 1:num_images
+        for k = 1:expe.numberOfFrames
 
             zNumber = j;
             fNumber = k;
@@ -116,18 +128,23 @@ for i = expe.indexOfFirstMovie:(expe.indexOfFirstMovie + expe.numberOfMovies  -1
     end
 
 end
+
+case 'bsf'
    
 %% unstacked tif
 
 
 doDraw = 1 ;
-i=5;
 
-%for i = expe.indexOfFirstMovie:(expe.indexOfFirstMovie + expe.numberOfMovies  -1)
+
+for i = expe.indexOfFirstMovie:(expe.indexOfFirstMovie + expe.numberOfMovies  -1)
     
     mkdirIfNotExist([expe.mainDir '/movie' num2str(i)]);
     mkdirIfNotExist([expe.mainDir '/movie' num2str(i) '/img/']);
-
+    
+    system(['sudo chmod +w ' expe.mainDir '/movie' num2str(i) '/img/'])
+    system(['sudo chmod +w ' expe.mainDir '/movie' num2str(i) '/img/*.png'])
+    
     disp(i);
     
     for j = 1:length(expe.colorNames)
@@ -137,33 +154,43 @@ i=5;
         for k = 1:expe.numberOfFrames
 
             k
-            fname = getOriginalImageName(expe,colorName,i,k);    
+            fname = getOriginalImageName(expe,colorName,i,k,naming);    
             fname = ['''' fname ''''];  
             
-%             A = imread(fname);
-% 
-%             if(doDraw && mod(k,2)==0)
-%                 clf
-%                 imagesc(A)
-%                 drawnow
-%             end
-% 
-
             imgName = getImageName(colorName,k);
 
             name = [expe.mainDir '/movie' num2str(i) '/img/' imgName];
             name = ['''' name ''''];  
-            %imwrite(A,name)
-            
+                        
             system(['cp -v ' fname ' ' name]);
-
         end
                     
     end
-%end
-   
-%%
+    
+    if( expe.hasTrans )
+        
+        colorName = expe.transName
+    
+        for k = 1:expe.numberOfFrames
+                        k
+            fname = getOriginalImageName(expe,colorName,i,k,naming);    
+            fname = ['''' fname ''''];  
+            
+            imgName = getImageName(colorName,k);
 
+            name = [expe.mainDir '/movie' num2str(i) '/img/' imgName];
+            name = ['''' name ''''];  
+                        
+            system(['cp -v ' fname ' ' name]);
+        end
+    end
+        
+    
+end
+   
+
+
+end
 
 
 

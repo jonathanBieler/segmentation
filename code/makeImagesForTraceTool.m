@@ -5,9 +5,6 @@ for n=1:length(longTraces)
     idx = longTraces(n);
     disp(100*n / length(longTraces));
     
-    %i = round(traj{idx}(:,1));
-    %j = round(traj{idx}(:,2));
-    
     i = round(trajX(idx,:));
     j = round(trajY(idx,:));
 
@@ -92,7 +89,7 @@ for n=1:length(longTraces)
             
             m = m(selj,seli);    
             if( useFullSizeImages )
-               m = imresize(m, size(sub_a));
+               m = imresize(m, size(sub_a),'nearest');
             end
          
             %make a nice gif            

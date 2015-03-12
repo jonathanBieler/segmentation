@@ -32,6 +32,7 @@ for n=1:length(longTraces)
 
         
         if( ind(idx,k)~=0 )
+            
             a = imread(['zStackedYFP/' num2str(k) '.png']);
 
             data = {};

@@ -1,14 +1,18 @@
 %% video cell position
 
+if(~exist('longTraces','var'))
+   longTracesOnly = 0;
+end
+   
 
 clf;
 colormap hot
 
 col = rand(length(traj),3);
 
-col(:,1) = 0.4*col(:,1);
-col(:,2) = 0.4*col(:,2);
-col(:,3) = col(:,3).^0.1;
+col(:,1) = 0.7*col(:,1);
+col(:,2) = 0.7*col(:,2);
+col(:,3) = col(:,3).^0.5;
 
 
 for k=1:1:NToTrack
@@ -44,7 +48,7 @@ for k=1:1:NToTrack
 
             if(k>1 && trajX(j,k-1)>0 && trajY(j,k-1)>0)
 
-                plot([trajX(j,k-1) trajX(j,k)],[trajY(j,k-1) trajY(j,k)],'color',col(i,:))        
+                plot([trajX(j,k-1) trajX(j,k)],[trajY(j,k-1) trajY(j,k)],'color',col(i,:))
             end        
 
         end

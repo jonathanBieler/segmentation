@@ -6,21 +6,20 @@ expe=struct();
 
 %% change this
 
-expe.numberOfFrames = 600;
-expe.dt = 1/12;
+expe.numberOfFrames = 30;
+expe.dt = 1/2;
 
 expe.numberOfMovies = 1;
-expe.indexOfFirstMovie = 1;
+expe.indexOfFirstMovie = 2;
 
-expe.numberOfColors = 2;
-expe.colorNames = {'YFP','TexasRed'};
+expe.numberOfColors = 1;
+expe.colorNames = {'LUC'};
 
 expe.hasTrans = 0;
-expe.transName = 'Trans';
+expe.transName = 'Trans'; %use Trans for bsf, see getOriginalImageName.m
 
-expe.imgDir = '/Volumes/Backup/2015_19_02_Rosie_Venus_H2B_Z_stacks_1/b4/';
-
-expe.mainDir = '/Users/bieler/Desktop/matlab/histoneStuff/2015_19_02_Rosie_Venus_H2B_Z_stacks_1';
+expe.imgDir = '/Users/bieler/Desktop/matlab/testMovies/';
+expe.mainDir = '/Users/bieler/Desktop/matlab/segmentation3';
 
 %% don't change that
 

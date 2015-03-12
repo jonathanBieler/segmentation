@@ -77,6 +77,8 @@ for i=1:Nz
             
 
 end
+
+%%
         
 
 out = zeros(size(a(:,:,1)));
@@ -96,7 +98,7 @@ end
 out = imnorm(out);
 
 if( ~strcmp( deNoise, 'localNorm') )
-    out(out>0.5)=0.5;
+    %out(out>0.5)=0.5;
     %out(out<quantile(out(:),0.2))=0.0;
     out = imnorm(out);
 end
