@@ -441,20 +441,20 @@ imagesc(peakMatrix(:,:,2)-0.1*divMatrix)
 
 %% make nice time plot with images
 
-i=3;
-idx = longTraces(i);
+i=7;
 
-signalToPlot = refinedSum(:,:,1)-bkg(:,:,1).*refinedArea(:,:,1); %which signal to plot
-colorIndex = 1; %which images to show
+idx = longTraces(i);
+signalToPlot = refinedSum(:,:,2)-bkg(:,:,2).*refinedArea(:,:); %which signal to plot
+colorIndex = 2; %which images to show
 showSeg = 1;
 
 gaussianFilterSize = 0; %set to zero to disable
-doNormalize=1;
+doNormalize = 1;
 
-s  = 40;    % size of window around the cell
+s  = 30;    % size of window around the cell
 nR = 3;    % number of rows in the image
 
-NtoPlot = 15;
+NtoPlot = 50;
 start = 1;
 
 useFullSizeImages = 1;
@@ -462,7 +462,8 @@ doDraw = 1;
 
 makeImageTimePlot
 
-fname =['figures/cell' n2s(longTraces(i)) '.png'];
+mkdirIfNotExist('figures');
+fname =['figures/cell' n2s(idx) '.png'];
 write_image(fname,0.6);
 system(['open ' fname])
 

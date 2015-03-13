@@ -50,9 +50,13 @@ for k=start:1: min(sel(end), start+NtoPlot-1)
     end
     
     
-    seg = imread( ['zStackedThreshCorrectedRefined/' n2s(k) '.png'] );
+    if(exist(['zStackedThreshCorrectedRefined/' n2s(k) '.png'] ,'file'))
+        seg = imread( ['zStackedThreshCorrectedRefined/' n2s(k) '.png'] );
+    else
+        seg = imread( ['zStackedThreshCorrected/' n2s(k) '.png'] );
+    end
     
-    [seli selj] = getNeiInd(i(k),j(k),s,N2,N1);
+    [seli selj] = getNeiInd(i(k),j(k),s,N1,N2);
     
     if( useFullSizeImages)
         [selif seljf] = getNeiInd(1+binsize*(i(k)-1),1+binsize*(j(k)-1),binsize*s,binsize*N1,binsize*N2);
@@ -202,7 +206,7 @@ for j=1:length(divs)
 end
 
 for j=1:length(peaks)
-   plot([t(peaks(j)) t(peaks(j))],[min(s)-0.04 0.6*max(s(:))],'color','r') 
+   plot([t(peaks(j)) t(peaks(j))],[min(s)-0.04 0.6*max(s(:))],'color','b') 
 end
 
 plot(t,s,'k')
