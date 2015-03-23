@@ -22,7 +22,7 @@ function varargout = guiTraces(varargin)
 
 % Edit the above text to modify the response to help guiTraces
 
-% Last Modified by GUIDE v2.5 21-Nov-2014 14:18:14
+% Last Modified by GUIDE v2.5 23-Mar-2015 14:47:18
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -82,7 +82,7 @@ function guiTraces_OpeningFcn(hObject, eventdata, handles, varargin)
     axesData = handles.axes1;
     axesGif = handles.axes2;
 
-    global areaMatrix tracks  signal traj ind longTraces peakMatrix divMatrix divisions modK speed expe;
+    global areaMatrix tracks  signal traj ind longTraces peakMatrix divMatrix divisions modK speed expe goodTraces;
     global caxisMin caxisMax;
         
     expe = experimentPara();
@@ -128,8 +128,13 @@ function guiTraces_OpeningFcn(hObject, eventdata, handles, varargin)
 
     Ntraces = length(longTraces);  
     
+    if(exist('goodTraces.mat','file'))
+       load goodTraces.mat           
+    else
+       goodTraces = ones(length(longTraces),1);
+    end
+    
     %set the color scale
-
         
     if(exist(['snapShots/' num2str(longTraces(1)) '_' num2str(1) '.png'],'file'))
         im = imread(['snapShots/' num2str(longTraces(1)) '_' num2str(1) '.png']);
@@ -146,7 +151,10 @@ function guiTraces_OpeningFcn(hObject, eventdata, handles, varargin)
     global gif gmap;    
     %[gif gmap] = imread([moviePath 'snapShots/' num2str(longTraces(k)) '.gif'],'frames','all');
     
-    set(handles.text3,'String',num2str(longTraces(k)));
+    set(handles.text3,'String',['Trace: ' num2str(longTraces(k)) ' (' num2str(k) '/' num2str(length(longTraces)) ' in longTraces)'] );
+    
+    set(handles.checkbox3,'value',goodTraces(k));
+    
     updatePlot(handles);
     updatePlotGif();
 
@@ -174,7 +182,7 @@ function  updatePlotGif()
 function KeyPress(Source, EventData)
     
     handles = guidata(gcf);
-    global t speed gmap axesData moviePath k tracks signal traj ind longTraces peakMatrix divMatrix Nframes divisions Ntraces gif expe;
+    global t speed gmap axesData moviePath k tracks signal traj ind longTraces peakMatrix divMatrix Nframes divisions Ntraces gif expe goodTraces;
 
     dt=expe.dt;
     
@@ -210,6 +218,10 @@ function KeyPress(Source, EventData)
     end
     
     switch EventData.Character
+        
+        case ' '
+            set(handles.checkbox3,'value',  ~get(handles.checkbox3,'value') );
+            checkbox3_Callback(0, 0, handles)
         
         %remove everything
         case 'k'
@@ -274,6 +286,7 @@ function KeyPress(Source, EventData)
             hasKChanged=1;
             
             
+            
         case '2'
 
             k=min(k+1,Ntraces);
@@ -293,7 +306,9 @@ function KeyPress(Source, EventData)
     
     if(hasKChanged)
                 
-        set(handles.text3,'String',[num2str(longTraces(k)) ' (' num2str(k) '/' num2str(length(longTraces)) ')'] );
+        set(handles.checkbox3,'value',goodTraces(k));
+        
+        set(handles.text3,'String',['Trace: ' num2str(longTraces(k)) ' (' num2str(k) '/' num2str(length(longTraces)) ' in longTraces)'] );
         
        % [gif gmap] = imread([moviePath 'snapShots/' num2str(longTraces(k)) '.gif'],'frames','all');
         updatePlotGif();
@@ -331,8 +346,6 @@ function mouseMove(hObject,eventdata)
         updatePlotGif();
 
     end
-    
-    
     
     
 %     %load data
@@ -460,7 +473,7 @@ function updatePlot(handles)
     
 %    set(gca,'XTick',  0:2:expe.t(NToTrack) )
     
-    tmp = signal(idx,:,:);
+    tmp = signal(idx,:,:); tmp = tmp(tmp>0);
     axis([0 expe.t(length(tmpArea)) 0.9*min(tmp(:)) 1.2*max( tmp(:) )])
     
 
@@ -578,3 +591,15 @@ end
 function areadraw_Callback(hObject, eventdata, handles)
 
 updatePlot(handles)
+
+
+% --- Executes on button press in checkbox3.
+function checkbox3_Callback(hObject, eventdata, handles)
+
+    global goodTraces k;
+    
+    goodTraces(k) = get(handles.checkbox3,'value');
+    save goodTraces.mat goodTraces
+    
+
+%

@@ -362,6 +362,12 @@ guiTraces
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% MAKE SOME PLOTS %%%%%%%%%%%%%%%%%%%%%%%
 
+%% which traces are good ?
+
+load goodTraces
+find(goodTraces==1)
+
+
 %% plot mean signal of trace i with std
 
 i=1
