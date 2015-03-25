@@ -10,7 +10,7 @@ N = expe.numberOfFrames;
 
 % Define some stuff, move into the right folder
 
-movie = 51;
+movie = 2;
 
 binsize = 2;
 
@@ -63,7 +63,7 @@ weightsSegmentation = [1 1 1]; %weights for summing the different channels
 compressionQuantile = 0.999;   %signal above this quantile will be cut off, set to 1 to disable
 gaussianFilterSize = 20;       %typycal length of the background
 
-temporalBinning = 2;
+temporalBinning = 4;
 
 doDraw = 1;
 
@@ -79,7 +79,8 @@ for k=1:N
     disp(100*k/N)                 
     a = imread(['zStackedYFP/' num2str(k) '.png']);
     clf
-    imagesc(a); %caxis([0 250])        
+    imagesc(a);
+    %caxis([0 250])        
     pause(0.08); drawnow;          
 end
 
