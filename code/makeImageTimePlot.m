@@ -196,7 +196,9 @@ hold on
 sel = find(ind(idx,:)>0);
 
 t = linspace(0,length(sel)*expe.dt,length(sel));
-s =  imnorm(signalToPlot(idx,sel));
+%s =  imnorm(signalToPlot(idx,sel));
+
+s =  (signalToPlot(idx,sel));
 
 divs = find(divMatrix(idx,sel));
 peaks = find(peakMatrix(idx,sel,colorIndex));

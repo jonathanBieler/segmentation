@@ -241,6 +241,8 @@ if( ~doLinksOnly )
   end
   
 
+  %dist = exp(dist/max(dist(~isinf(dist))));
+  
   tic
   %[assign, cost] = munkres(dist);
   [assign, cost] = assignmentoptimal(dist); %mex version

@@ -12,7 +12,7 @@ N = expe.numberOfFrames;
 
 movie = 2;
 
-binsize = 2;
+binsize = 4;
 
 outDir = [mainDir '/movie' num2str(movie) '/'];
 cd(outDir)
@@ -63,7 +63,7 @@ weightsSegmentation = [1 1 1]; %weights for summing the different channels
 compressionQuantile = 0.999;   %signal above this quantile will be cut off, set to 1 to disable
 gaussianFilterSize = 20;       %typycal length of the background
 
-temporalBinning = 4;
+temporalBinning = 5;
 
 doDraw = 1;
 
@@ -80,6 +80,7 @@ for k=1:N
     a = imread(['zStackedYFP/' num2str(k) '.png']);
     clf
     imagesc(a);
+    colormap jet
     %caxis([0 250])        
     pause(0.08); drawnow;          
 end
@@ -154,6 +155,7 @@ if doDraw
          a = double(a);
          b = double(b);
 
+         clf
          imagesc(a+b);
          pause(0.03)
     end
@@ -211,7 +213,7 @@ indAnnotation = zeros(size(ind));
 if( exist('lengthThresh.mat','file') )
     load lengthThresh.mat;
 else
-    lengthThresh = 0.9; %note: to change lengthThresh value you first need to delete the file if it exists: !rm lengthThresh.mat
+    lengthThresh = 0.99; %note: to change lengthThresh value you first need to delete the file if it exists: !rm lengthThresh.mat
 end
 
 for i=1:size(ind,1)
@@ -253,13 +255,13 @@ makePeakAndDivMatrices
 doDrawBkg = 0;  %display there area where the background is measured 
 doDraw = 1;     %display area refinement result
 
-bgkSize = 10;    %size around the cell where the background is not quantified
+bgkSize = 6;    %size around the cell where the background is not quantified
 superSampling = 1; %increase the resolution of the image (must be an integer)
 
-NIteration = 10; % Number of iteration of the area refinement algorithm, increase when using temporal binning
+NIteration = 8; % Number of iteration of the area refinement algorithm, increase when using temporal binning
 dilateSizeAfterRefine = 1; %if >=1 dilate a bit the area after the refinement
 
-s = 50; %size of the window around the cells
+s = 15; %size of the window around the cells
 
 mkdirIfNotExist('snapShots')
 
@@ -285,15 +287,15 @@ refineAreaAndSignal
 mkdirIfNotExist('snapShots')
 
 doDraw = 1;
-useFullSizeImages = 1;
+useFullSizeImages = 0;
 inputFolder = 'zStackedYFP/';
 threshFoler = {'zStackedThreshCorrected','zStackedThreshCorrectedRefined'};
-threshFoler = threshFoler{2};
+threshFoler = threshFoler{1};
   
 NToTrack = N;
 
-colorIndex = 2;
-s = 45;
+colorIndex = 1;
+s = 15;
 
 traces = 1:length(longTraces);
 
@@ -396,30 +398,39 @@ imagesc(peakMatrix(:,:,2)-0.1*divMatrix)
 
 %% make nice time plot with images
 
-i=7;
+i=5;
 
 idx = longTraces(i);
-signalToPlot = refinedSum(:,:,2)-bkg(:,:,2).*refinedArea(:,:); %which signal to plot
-colorIndex = 2; %which images to show
+%signalToPlot = refinedSum(:,:,1);%-bkg(:,:,1).*refinedArea(:,:); %which signal to plot
+signalToPlot = signal(:,:,1); %which signal to plot
+
+colorIndex = 1; %which images to show
 showSeg = 1;
 
 gaussianFilterSize = 0; %set to zero to disable
-doNormalize = 1;
+doNormalize = 0;
 
-s  = 30;    % size of window around the cell
+s  = 8;    % size of window around the cell
 nR = 3;    % number of rows in the image
 
 NtoPlot = 50;
 start = 1;
 
-useFullSizeImages = 1;
+useFullSizeImages = 0;
 doDraw = 1;
 
 makeImageTimePlot
+
+
+
+
+%%
 
 mkdirIfNotExist('figures');
 fname =['figures/cell' n2s(idx) '.png'];
 write_image(fname,0.6);
 system(['open ' fname])
 
+
+%%
 

@@ -368,7 +368,9 @@ switch EventData.Character
            
             se = strel('disk',3);
             seg = imfill(seg,'holes');
-            seg = imopen(seg, se);     
+            if(N1 > 300)
+                seg = imopen(seg, se);        
+            end
 
             if(k>1)
                previousSeg = imread([moviePath 'zStackedThreshCorrected/' num2str(k-1) '.png']);
@@ -389,7 +391,9 @@ switch EventData.Character
            
             se = strel('disk',3);
             seg = imfill(seg,'holes');
-            seg = imopen(seg, se);        
+            if(N1 > 300)
+                seg = imopen(seg, se);        
+            end
             
             if(k>1)
                previousSeg = imread([moviePath 'zStackedThreshCorrected/' num2str(k-1) '.png']);
@@ -429,7 +433,11 @@ switch EventData.Character
        out = (r>=1).*seg(seli,selj) + (r<1).*sub_seg;
         
        se = strel('disk',4);
-       out = imfill(out,'holes'); out = imopen(out, se);
+       out = imfill(out,'holes'); 
+       
+       if(N1 > 300)
+          seg = imopen(out, se);        
+       end
               
        seg(seli,selj) = out;
        
